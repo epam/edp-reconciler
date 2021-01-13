@@ -3,7 +3,7 @@ package service
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	codebaseperfdatasourceRepo "github.com/epmd-edp/reconciler/v2/pkg/repository/codebaseperfdatasource"
 	"github.com/epmd-edp/reconciler/v2/pkg/service/codebaseperfdatasource"
 	"github.com/epmd-edp/reconciler/v2/pkg/service/perfdatasource"

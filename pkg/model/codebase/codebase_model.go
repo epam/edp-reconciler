@@ -19,7 +19,7 @@ package codebase
 import (
 	"errors"
 	"fmt"
-	edpv1alpha1Codebase "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epmd-edp/reconciler/v2/pkg/model"
 	"strings"
 )
@@ -33,41 +33,42 @@ const (
 type CodebaseType string
 
 type Codebase struct {
-	Name                 string
-	Tenant               string
-	Type                 string
-	Language             string
-	Framework            *string
-	BuildTool            string
-	Strategy             string
-	RepositoryUrl        string
-	RouteSite            string
-	RoutePath            string
-	DatabaseKind         string
-	DatabaseVersion      string
-	DatabaseCapacity     string
-	DatabaseStorage      string
-	ActionLog            model.ActionLog
-	Description          string
-	TestReportFramework  string
-	Status               string
-	GitServer            string
-	GitUrlPath           *string
-	GitServerId          *int
-	JenkinsSlave         *string
-	JenkinsSlaveId       *int
-	JobProvisioning      *string
-	JobProvisioningId    *int
-	DeploymentScript     string
-	VersioningType       string
-	StartVersioningFrom  *string
-	JiraServer           *string
-	JiraServerId         *int
-	CommitMessagePattern *string
-	TicketNamePattern    *string
-	CiTool               string
-	Perf                 *Perf
-	DefaultBranch        string
+	Name                     string
+	Tenant                   string
+	Type                     string
+	Language                 string
+	Framework                *string
+	BuildTool                string
+	Strategy                 string
+	RepositoryUrl            string
+	RouteSite                string
+	RoutePath                string
+	DatabaseKind             string
+	DatabaseVersion          string
+	DatabaseCapacity         string
+	DatabaseStorage          string
+	ActionLog                model.ActionLog
+	Description              string
+	TestReportFramework      string
+	Status                   string
+	GitServer                string
+	GitUrlPath               *string
+	GitServerId              *int
+	JenkinsSlave             *string
+	JenkinsSlaveId           *int
+	JobProvisioning          *string
+	JobProvisioningId        *int
+	DeploymentScript         string
+	VersioningType           string
+	StartVersioningFrom      *string
+	JiraServer               *string
+	JiraServerId             *int
+	CommitMessagePattern     *string
+	TicketNamePattern        *string
+	CiTool                   string
+	Perf                     *Perf
+	DefaultBranch            string
+	JiraIssueMetadataPayload *string
 }
 
 type Perf struct {
@@ -172,6 +173,10 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 			Name:        s.Perf.Name,
 			DataSources: s.Perf.DataSources,
 		}
+	}
+
+	if s.JiraIssueMetadataPayload != nil {
+		c.JiraIssueMetadataPayload = s.JiraIssueMetadataPayload
 	}
 	return &c, nil
 }
