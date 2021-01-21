@@ -20,7 +20,7 @@ const (
 	updateCodebaseStatus = "update \"%v\".codebase set status = $1 where id = $2;"
 	selectApplication    = "select id from \"%v\".codebase where name=$1 and type='application';"
 	deleteCodebase       = "delete from \"%v\".codebase where name=$1;"
-	updateCodebase       = "update \"%v\".codebase set commit_message_pattern = $1, ticket_name_pattern = $2 where name = $3;"
+	updateCodebase       = "update \"%v\".codebase set commit_message_pattern = $1, ticket_name_pattern = $2, jira_issue_metadata_payload = $3 where name = $4;"
 )
 
 const (
@@ -157,6 +157,6 @@ func Update(txn sql.Tx, c codebase.Codebase, schema string) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(getStringOrNil(c.CommitMessagePattern), getStringOrNil(c.TicketNamePattern), c.Name)
+	_, err = stmt.Exec(getStringOrNil(c.CommitMessagePattern), getStringOrNil(c.TicketNamePattern), getStringOrNil(c.JiraIssueMetadataPayload), c.Name)
 	return err
 }
