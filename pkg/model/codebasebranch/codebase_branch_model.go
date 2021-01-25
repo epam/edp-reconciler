@@ -41,6 +41,8 @@ var codebaseBranchActionMessageMap = map[string]string{
 	"codebase_branch_registration":        "Branch %v for codebase %v registration",
 	"accept_codebase_branch_registration": "Accept branch %v for codebase %v registration",
 	"put_branch_for_gitlab_ci_codebase":   "Create %v branch for %v codebase in Git ",
+	"trigger_release_job":                 "Trigger release job. Branch - %v, Codebase - %v",
+	"perf_data_source_cr_update":          "Update PerfDataSource CR. Branch - %v, Codebase - %v",
 }
 
 func ConvertToCodebaseBranch(k8sObject edpv1alpha1Codebase.CodebaseBranch, edpName string) (*CodebaseBranch, error) {
