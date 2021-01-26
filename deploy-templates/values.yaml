@@ -7,6 +7,10 @@ global:
     port: 5432
 
 name: reconciler
+annotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
 image:
   name: reconciler
   # if not defined then .Chart.AppVersion is used
