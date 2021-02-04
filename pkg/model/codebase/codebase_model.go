@@ -43,10 +43,6 @@ type Codebase struct {
 	RepositoryUrl            string
 	RouteSite                string
 	RoutePath                string
-	DatabaseKind             string
-	DatabaseVersion          string
-	DatabaseCapacity         string
-	DatabaseStorage          string
 	ActionLog                model.ActionLog
 	Description              string
 	TestReportFramework      string
@@ -142,18 +138,6 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 	} else {
 		c.RouteSite = ""
 		c.RoutePath = ""
-	}
-
-	if s.Database != nil {
-		c.DatabaseKind = s.Database.Kind
-		c.DatabaseVersion = s.Database.Version
-		c.DatabaseStorage = s.Database.Storage
-		c.DatabaseCapacity = s.Database.Capacity
-	} else {
-		c.DatabaseKind = ""
-		c.DatabaseVersion = ""
-		c.DatabaseStorage = ""
-		c.DatabaseCapacity = ""
 	}
 
 	if s.Description != nil {

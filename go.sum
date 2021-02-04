@@ -65,6 +65,8 @@ github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20201106143626-fac13626a6f8
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20201106143626-fac13626a6f8/go.mod h1:rDXVz1yVp31XRlHNTEIa/bLqAd5Y2H1LaagU6dH0vXg=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210112152817-7bdf8b631489 h1:H6fTNsALABaSnTcjd2ZPx/EinGQ8xs2dqcr8HrYS2Aw=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210112152817-7bdf8b631489/go.mod h1:sZMj9NdnEygGeo9HwvqG1ZTndcmLrKoBVLKnKBVYMlc=
+github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210205072010-6734242b9ed9 h1:fPJ/zAqRzuhDARi32a/x7sIaF7qqmL/4aioo2sh5uDM=
+github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210205072010-6734242b9ed9/go.mod h1:/acNbcSLor5PwxDbO96AqodSxQjc8qtBe2kEBOItrt8=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-50 h1:2a+EYbwYjhwJa0MAd4lsq1/LmTAqPp8/G9yAeheYPuQ=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.2.0-50/go.mod h1:ygALtMzvxjLfbXLfGqZ+eGjsARgBdyf6IvoTl5NF5Kk=
 github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200522123451-d0fa24eeeb1f h1:2P2OOK+CNy4qttKkPpe1SuW55D3zNyPP8617pvou5pA=
