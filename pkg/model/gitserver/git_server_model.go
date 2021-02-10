@@ -18,7 +18,8 @@ package gitserver
 
 import (
 	"errors"
-	edpv1alpha1Codebase "github.com/epmd-edp/codebase-operator/v2/pkg/apis/edp/v1alpha1"
+
+	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epmd-edp/reconciler/v2/pkg/model"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
