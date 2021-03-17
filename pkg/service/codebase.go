@@ -91,6 +91,15 @@ func (s CodebaseService) putCodebase(txn *sql.Tx, c codebase.Codebase, schema st
 
 func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 	log.Printf("start updating codebase %v", c.Name)
+
+	id, err := getJiraServerId(txn, c.JiraServer, schema)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't get Jira server id by %v name", *c.JiraServer)
+	}
+	if id != nil {
+		c.JiraServerId = id
+	}
+
 	if err := repository.Update(*txn, c, schema); err != nil {
 		return errors.Wrapf(err, "couldn't update codebase %v", c.Name)
 	}
