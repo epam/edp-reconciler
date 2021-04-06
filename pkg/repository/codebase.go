@@ -12,9 +12,9 @@ const (
 		" route_path, status, test_report_framework, description," +
 		" git_server_id, git_project_path, jenkins_slave_id, job_provisioning_id, deployment_script, project_status, versioning_type," +
 		" start_versioning_from, jira_server_id, commit_message_pattern, ticket_name_pattern, ci_tool, perf_server_id, default_branch," +
-		" jira_issue_metadata_payload)" +
+		" jira_issue_metadata_payload, empty_project)" +
 		" values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18," +
-		" $19, $20, $21, $22, $23, $24, $25, $26, $27) returning id;"
+		" $19, $20, $21, $22, $23, $24, $25, $26, $27, $28) returning id;"
 	selectCodebase       = "select id from \"%v\".codebase where name=$1;"
 	selectCodebaseType   = "select type from \"%v\".codebase where id=$1;"
 	updateCodebaseStatus = "update \"%v\".codebase set status = $1 where id = $2;"
@@ -63,7 +63,7 @@ func CreateCodebase(txn sql.Tx, c codebase.Codebase, schemaName string) (*int, e
 		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, getStatus(c.Strategy), c.VersioningType,
 		c.StartVersioningFrom, getIntOrNil(c.JiraServerId), getStringOrNil(c.CommitMessagePattern),
 		getStringOrNil(c.TicketNamePattern), c.CiTool, getPerfIdOrNil(c.Perf), c.DefaultBranch,
-		getStringOrNil(c.JiraIssueMetadataPayload)).Scan(&id)
+		getStringOrNil(c.JiraIssueMetadataPayload), c.EmptyProject).Scan(&id)
 	if err != nil {
 		return nil, err
 	}

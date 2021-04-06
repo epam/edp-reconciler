@@ -65,6 +65,7 @@ type Codebase struct {
 	Perf                     *Perf
 	DefaultBranch            string
 	JiraIssueMetadataPayload *string
+	EmptyProject             bool
 }
 
 type Perf struct {
@@ -119,6 +120,7 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 		TicketNamePattern:    s.TicketNamePattern,
 		CiTool:               s.CiTool,
 		DefaultBranch:        s.DefaultBranch,
+		EmptyProject:         s.EmptyProject,
 	}
 
 	if s.Framework != nil {

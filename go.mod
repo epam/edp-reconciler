@@ -8,8 +8,8 @@ replace github.com/openshift/api => github.com/openshift/api v0.0.0-201808011710
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210205093222-d549d08b44b0
-	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20200522123451-d0fa24eeeb1f
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210402134040-488f8d819dd9
+	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20201217130859-a9d5aeca1889
 	github.com/epmd-edp/edp-component-operator v0.1.1-0.20200827122548-e87429a916e0
 	github.com/epmd-edp/jenkins-operator/v2 v2.3.0-130.0.20200525102742-f56cd8641faa
 	github.com/epmd-edp/perf-operator/v2 v2.0.0-20201130105408-ffc11d6fdd20
