@@ -42,6 +42,7 @@ var codebaseBranchActionMessageMap = map[string]string{
 	"accept_codebase_branch_registration": "Accept branch %v for codebase %v registration",
 	"put_branch_for_gitlab_ci_codebase":   "Create %v branch for %v codebase in Git ",
 	"trigger_release_job":                 "Trigger release job. Branch - %v, Codebase - %v",
+	"put_codebase_image_stream":           "Put Codebase ImageStream. Branch - %v, Codebase - %v",
 	"perf_data_source_cr_update":          "Update PerfDataSource CR. Branch - %v, Codebase - %v",
 }
 
