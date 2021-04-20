@@ -1,4 +1,4 @@
-FROM alpine:3.11.8
+FROM alpine:3.11.10
 
 ENV OPERATOR=/usr/local/bin/reconciler \
     USER_UID=1001 \
