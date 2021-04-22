@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 type CodebaseBranch struct {

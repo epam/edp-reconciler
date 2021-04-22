@@ -3,7 +3,7 @@ package edp_component
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 const (

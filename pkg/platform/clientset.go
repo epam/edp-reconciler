@@ -113,7 +113,7 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 	config.GroupVersion = &SchemeGroupVersion
 	config.APIPath = "/apis"
 	config.ContentType = runtime.ContentTypeJSON
-	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)}
+	config.NegotiatedSerializer = serializer.NewCodecFactory(scheme)
 	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err

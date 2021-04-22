@@ -2,69 +2,58 @@ package stage
 
 import (
 	"context"
-	edpV1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/stage"
-	"github.com/epmd-edp/reconciler/v2/pkg/platform"
-	stage2 "github.com/epmd-edp/reconciler/v2/pkg/service/stage"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
+	"github.com/epam/edp-reconciler/v2/pkg/platform"
+	stageService "github.com/epam/edp-reconciler/v2/pkg/service/stage"
+	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"time"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var (
-	_   reconcile.Reconciler = &ReconcileStage{}
-	log                      = logf.Log.WithName("controller_stage")
-)
+const stageReconcileFinalizerName = "stage.reconciler.finalizer.name"
 
-// Add creates a new Stage Controller and adds it to the Manager. The Manager will set fields on the Controller
-// and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	clientSet, err := platform.CreateOpenshiftClients()
+func NewReconcileStage(client client.Client, scheme *runtime.Scheme, log logr.Logger) (*ReconcileStage, error) {
+	cs, err := platform.CreateOpenshiftClients()
 	if err != nil {
-		panic(err)
+		return nil, errors.Wrap(err, "unable to create openshift clients")
 	}
 
 	return &ReconcileStage{
-		client: mgr.GetClient(),
-		scheme: mgr.GetScheme(),
-		service: stage2.StageService{
+		client: client,
+		scheme: scheme,
+		service: stageService.StageService{
 			DB:        db.Instance,
-			ClientSet: *clientSet,
+			ClientSet: *cs,
 		},
-	}
+		log: log.WithName("cd-stage"),
+	}, nil
 }
 
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("stage-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
+type ReconcileStage struct {
+	client  client.Client
+	scheme  *runtime.Scheme
+	service stageService.StageService
+	log     logr.Logger
+}
 
-	pred := predicate.Funcs{
+func (r *ReconcileStage) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			oldObject := e.ObjectOld.(*edpV1alpha1.Stage)
-			newObject := e.ObjectNew.(*edpV1alpha1.Stage)
+			oldObject := e.ObjectOld.(*cdPipeApi.Stage)
+			newObject := e.ObjectNew.(*cdPipeApi.Stage)
 
 			if oldObject.Status.Value != newObject.Status.Value {
 				return true
@@ -79,28 +68,16 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		},
 	}
 
-	// Watch for changes to primary resource Stage
-	err = c.Watch(&source.Kind{Type: &edpV1alpha1.Stage{}}, &handler.EnqueueRequestForObject{}, pred)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&cdPipeApi.Stage{}, builder.WithPredicates(p)).
+		Complete(r)
 }
 
-const stageReconcilerFinalizerName = "stage.reconciler.finalizer.name"
-
-type ReconcileStage struct {
-	client  client.Client
-	scheme  *runtime.Scheme
-	service stage2.StageService
-}
-
-func (r *ReconcileStage) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	rl := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	rl.V(2).Info("Reconciling Stage")
-	i := &edpV1alpha1.Stage{}
-	if err := r.client.Get(context.TODO(), request.NamespacedName, i); err != nil {
+func (r *ReconcileStage) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.V(2).Info("Reconciling Stage")
+	i := &cdPipeApi.Stage{}
+	if err := r.client.Get(ctx, request.NamespacedName, i); err != nil {
 		if k8serrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -112,7 +89,7 @@ func (r *ReconcileStage) Reconcile(request reconcile.Request) (reconcile.Result,
 		return reconcile.Result{RequeueAfter: 2 * time.Second}, errors.Wrap(err, "cannot get edp name")
 	}
 
-	if res, err := r.tryToDeleteCDStage(i, *edpN); err != nil || res != nil {
+	if res, err := r.tryToDeleteCDStage(ctx, i, *edpN); err != nil || res != nil {
 		return *res, err
 	}
 
@@ -124,15 +101,15 @@ func (r *ReconcileStage) Reconcile(request reconcile.Request) (reconcile.Result,
 	if err = r.service.PutStage(*st); err != nil {
 		return reconcile.Result{RequeueAfter: 2 * time.Second}, errors.Wrap(err, "couldn't put stage")
 	}
-	rl.V(2).Info("Reconciling has been finished successfully")
+	log.V(2).Info("Reconciling has been finished successfully")
 	return reconcile.Result{}, nil
 }
 
-func (r ReconcileStage) tryToDeleteCDStage(i *edpV1alpha1.Stage, schema string) (*reconcile.Result, error) {
+func (r ReconcileStage) tryToDeleteCDStage(ctx context.Context, i *cdPipeApi.Stage, schema string) (*reconcile.Result, error) {
 	if i.GetDeletionTimestamp().IsZero() {
-		if !helper.ContainsString(i.ObjectMeta.Finalizers, stageReconcilerFinalizerName) {
-			i.ObjectMeta.Finalizers = append(i.ObjectMeta.Finalizers, stageReconcilerFinalizerName)
-			if err := r.client.Update(context.TODO(), i); err != nil {
+		if !helper.ContainsString(i.ObjectMeta.Finalizers, stageReconcileFinalizerName) {
+			i.ObjectMeta.Finalizers = append(i.ObjectMeta.Finalizers, stageReconcileFinalizerName)
+			if err := r.client.Update(ctx, i); err != nil {
 				return &reconcile.Result{}, err
 			}
 		}
@@ -143,8 +120,8 @@ func (r ReconcileStage) tryToDeleteCDStage(i *edpV1alpha1.Stage, schema string) 
 		return &reconcile.Result{RequeueAfter: 2 * time.Second}, err
 	}
 
-	i.ObjectMeta.Finalizers = helper.RemoveString(i.ObjectMeta.Finalizers, stageReconcilerFinalizerName)
-	if err := r.client.Update(context.TODO(), i); err != nil {
+	i.ObjectMeta.Finalizers = helper.RemoveString(i.ObjectMeta.Finalizers, stageReconcileFinalizerName)
+	if err := r.client.Update(ctx, i); err != nil {
 		return &reconcile.Result{RequeueAfter: 2 * time.Second}, err
 	}
 	return &reconcile.Result{}, nil

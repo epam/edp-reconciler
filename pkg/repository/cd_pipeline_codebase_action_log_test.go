@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 	"testing"
 	"time"
 )

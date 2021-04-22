@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/service"
+	"github.com/epam/edp-reconciler/v2/pkg/model/service"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

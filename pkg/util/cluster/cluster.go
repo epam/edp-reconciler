@@ -1,11 +1,20 @@
 package cluster
 
 import (
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"os"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"strconv"
 )
 
-var log = logf.Log.WithName("cluster-util")
+var log = ctrl.Log.WithName("cluster-util")
+
+const (
+	watchNamespaceEnvVar   = "WATCH_NAMESPACE"
+	debugModeEnvVar        = "DEBUG_MODE"
+	inClusterNamespacePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+)
 
 func GetOwnerReference(ownerKind string, ors []metav1.OwnerReference) *metav1.OwnerReference {
 	log.Info("finding owner", "kind", ownerKind)
@@ -18,4 +27,36 @@ func GetOwnerReference(ownerKind string, ors []metav1.OwnerReference) *metav1.Ow
 		}
 	}
 	return nil
+}
+
+// GetWatchNamespace returns the namespace the operator should be watching for changes
+func GetWatchNamespace() (string, error) {
+	ns, found := os.LookupEnv(watchNamespaceEnvVar)
+	if !found {
+		return "", fmt.Errorf("%s must be set", watchNamespaceEnvVar)
+	}
+	return ns, nil
+}
+
+// GetDebugMode returns the debug mode value
+func GetDebugMode() (bool, error) {
+	mode, found := os.LookupEnv(debugModeEnvVar)
+	if !found {
+		return false, nil
+	}
+
+	b, err := strconv.ParseBool(mode)
+	if err != nil {
+		return false, err
+	}
+	return b, nil
+}
+
+// Check whether the operator is running in cluster or locally
+func RunningInCluster() bool {
+	_, err := os.Stat(inClusterNamespacePath)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }

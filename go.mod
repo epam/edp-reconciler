@@ -1,27 +1,29 @@
-module github.com/epmd-edp/reconciler/v2
+module github.com/epam/edp-reconciler/v2
 
 go 1.14
 
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
-
-replace github.com/openshift/api => github.com/openshift/api v0.0.0-20180801171038-322a19404e37
+replace (
+	git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+	github.com/openshift/api => github.com/openshift/api v0.0.0-20210416130433-86964261530c
+	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20210112165513-ebc401615f47
+	k8s.io/api => k8s.io/api v0.20.7-rc.0
+)
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.4.1
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210402134040-488f8d819dd9
-	github.com/epmd-edp/cd-pipeline-operator/v2 v2.3.0-58.0.20201217130859-a9d5aeca1889
-	github.com/epmd-edp/edp-component-operator v0.1.1-0.20200827122548-e87429a916e0
-	github.com/epmd-edp/jenkins-operator/v2 v2.3.0-130.0.20200525102742-f56cd8641faa
-	github.com/epmd-edp/perf-operator/v2 v2.0.0-20201130105408-ffc11d6fdd20
-	github.com/lib/pq v1.0.0
-	github.com/openshift/api v3.9.0+incompatible
+	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210420131932-c2003069fbbd
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210420132935-d94e26c595a4
+	github.com/epam/edp-component-operator v0.1.1-0.20210413101042-1d8f823f27cc
+	github.com/epam/edp-gerrit-operator/v2 v2.3.0-73.0.20210420132608-44be98d61e11
+	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210420132755-4de3673f7668
+	github.com/epam/edp-perf-operator/v2 v2.0.0-20210420132104-20958a66482a
+	github.com/go-logr/logr v0.4.0
+	github.com/lib/pq v1.8.0
 	github.com/openshift/client-go v3.9.0+incompatible
-	github.com/operator-framework/operator-sdk v0.0.0-20190530173525-d6f9cdf2f52e
-	github.com/pkg/errors v0.8.1
-	github.com/spf13/pflag v1.0.3
-	github.com/stretchr/testify v1.4.0
-	k8s.io/api v0.0.0-20190222213804-5cb15d344471
-	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-	k8s.io/client-go v0.0.0-20190228174230-b40b2a5939e4
-	sigs.k8s.io/controller-runtime v0.1.12
+	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.6.1
+	k8s.io/api v0.21.0-rc.0
+	k8s.io/apimachinery v0.21.0-rc.0
+	k8s.io/client-go v0.20.2
+	sigs.k8s.io/controller-runtime v0.8.3
 )

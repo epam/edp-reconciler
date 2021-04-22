@@ -2,13 +2,13 @@ package jira_server
 
 import (
 	"database/sql"
-	jiramodel "github.com/epmd-edp/reconciler/v2/pkg/model/jira-server"
-	jiraserver "github.com/epmd-edp/reconciler/v2/pkg/repository/jira-server"
+	jiramodel "github.com/epam/edp-reconciler/v2/pkg/model/jira-server"
+	jiraserver "github.com/epam/edp-reconciler/v2/pkg/repository/jira-server"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("jira-server-service")
+var log = ctrl.Log.WithName("jira-server-service")
 
 type JiraServerService struct {
 	DB *sql.DB

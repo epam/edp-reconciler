@@ -3,14 +3,14 @@ package edp_component
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	ec "github.com/epmd-edp/reconciler/v2/pkg/repository/edp-component"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	ec "github.com/epam/edp-reconciler/v2/pkg/repository/edp-component"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"strings"
 )
 
-var log = logf.Log.WithName("edp-component-service")
+var log = ctrl.Log.WithName("edp-component-service")
 
 type EDPComponentService struct {
 	DB *sql.DB

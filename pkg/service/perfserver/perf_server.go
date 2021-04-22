@@ -2,13 +2,13 @@ package perfserver
 
 import (
 	"database/sql"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/perfserver"
-	perfServerRepo "github.com/epmd-edp/reconciler/v2/pkg/repository/perfserver"
+	"github.com/epam/edp-reconciler/v2/pkg/model/perfserver"
+	perfServerRepo "github.com/epam/edp-reconciler/v2/pkg/repository/perfserver"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("perf-server-service")
+var log = ctrl.Log.WithName("perf-server-service")
 
 type PerfServerService struct {
 	DB *sql.DB

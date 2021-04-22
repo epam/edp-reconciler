@@ -2,9 +2,9 @@ package perfdatasource
 
 import (
 	"database/sql"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/codebase"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/perfdatasource"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/perfdatasource"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"strings"
 )
 
@@ -12,7 +12,7 @@ type PerfDataSourceService struct {
 	DB *sql.DB
 }
 
-var log = logf.Log.WithName("perf-data-source-service")
+var log = ctrl.Log.WithName("perf-data-source-service")
 
 func (s PerfDataSourceService) perfDataSourceExists(dsType, tenant string) (bool, error) {
 	log.Info("checking for existence record data source", "type", dsType)
