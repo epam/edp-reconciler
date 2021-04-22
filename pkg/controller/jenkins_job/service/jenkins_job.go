@@ -4,18 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	jenv1alpha1 "github.com/epmd-edp/jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	"github.com/epmd-edp/jenkins-operator/v2/pkg/util/consts"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository"
-	"github.com/epmd-edp/reconciler/v2/pkg/util/cluster"
+	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	jenv1alpha1 "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	"github.com/epam/edp-jenkins-operator/v2/pkg/util/consts"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	"github.com/epam/edp-reconciler/v2/pkg/util/cluster"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
 
 const ErrorStatus = "error"
@@ -31,7 +31,7 @@ type JenkinsJobService struct {
 	Client client.Client
 }
 
-var log = logf.Log.WithName("jenkins-job-service")
+var log = ctrl.Log.WithName("jenkins-job-service")
 
 func (s JenkinsJobService) UpdateActionLog(jj *jenv1alpha1.JenkinsJob) error {
 	log.V(2).Info("start adding action log for jenkins job", "name", jj.Name)

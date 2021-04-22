@@ -3,7 +3,7 @@ package thirdpartyservice
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/service"
+	"github.com/epam/edp-reconciler/v2/pkg/model/service"
 )
 
 const (

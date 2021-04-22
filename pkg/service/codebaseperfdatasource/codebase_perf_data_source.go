@@ -2,10 +2,10 @@ package codebaseperfdatasource
 
 import (
 	"database/sql"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/codebase"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/codebaseperfdatasource"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/perfdatasource"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/codebaseperfdatasource"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/perfdatasource"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"strings"
 )
 
@@ -13,7 +13,7 @@ type CodebasePerfDataSourceService struct {
 	DB *sql.DB
 }
 
-var log = logf.Log.WithName("codebase-perf-data-source-service")
+var log = ctrl.Log.WithName("codebase-perf-data-source-service")
 
 func (s CodebasePerfDataSourceService) InsertCodebasePerfDataSources(codebaseId int, perf *codebase.Perf, tenant string) error {
 	if perf == nil {

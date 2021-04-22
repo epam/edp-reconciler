@@ -2,76 +2,61 @@ package perfdatasourcesonar
 
 import (
 	"context"
-	"github.com/epmd-edp/perf-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	"github.com/epmd-edp/reconciler/v2/pkg/service/perfdatasource"
-	"github.com/epmd-edp/reconciler/v2/pkg/util/cluster"
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/service/perfdatasource"
+	"github.com/epam/edp-reconciler/v2/pkg/util/cluster"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 )
 
-var log = logf.Log.WithName("controller_perf_data_source_sonar")
+const (
+	codebaseKind                          = "Codebase"
+	sonarDataSourceReconcileFinalizerName = "sonar.data.source.reconciler.finalizer.name"
+)
 
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+func NewReconcilePerfDataSourceSonar(client client.Client, log logr.Logger) *ReconcilePerfDataSourceSonar {
 	return &ReconcilePerfDataSourceSonar{
-		client: mgr.GetClient(),
+		client: client,
 		dsService: perfdatasource.PerfDataSourceService{
 			DB: db.Instance,
 		},
+		log: log.WithName("perf-data-source-sonar"),
 	}
 }
-
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	c, err := controller.New("perf-data-source-sonar-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
-
-	p := predicate.Funcs{
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			return e.ObjectNew.(*v1alpha1.PerfDataSourceSonar).DeletionTimestamp != nil
-		},
-	}
-
-	if err = c.Watch(&source.Kind{Type: &v1alpha1.PerfDataSourceSonar{}}, &handler.EnqueueRequestForObject{}, p); err != nil {
-		return err
-	}
-	return nil
-}
-
-var _ reconcile.Reconciler = &ReconcilePerfDataSourceSonar{}
-
-const (
-	codebaseKind = "Codebase"
-
-	sonarDataSourceReconcilerFinalizerName = "sonar.data.source.reconciler.finalizer.name"
-)
 
 type ReconcilePerfDataSourceSonar struct {
 	client    client.Client
 	dsService perfdatasource.PerfDataSourceService
+	log       logr.Logger
 }
 
-func (r *ReconcilePerfDataSourceSonar) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	rl := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	rl.Info("Reconciling PerfDataSourceSonar")
+func (r *ReconcilePerfDataSourceSonar) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Funcs{
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			return e.ObjectNew.(*perfApi.PerfDataSourceSonar).DeletionTimestamp != nil
+		},
+	}
 
-	i := &v1alpha1.PerfDataSourceSonar{}
-	if err := r.client.Get(context.TODO(), request.NamespacedName, i); err != nil {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&perfApi.PerfDataSourceSonar{}, builder.WithPredicates(p)).
+		Complete(r)
+}
+
+func (r *ReconcilePerfDataSourceSonar) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.Info("Reconciling PerfDataSourceSonar")
+
+	i := &perfApi.PerfDataSourceSonar{}
+	if err := r.client.Get(ctx, request.NamespacedName, i); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -83,20 +68,21 @@ func (r *ReconcilePerfDataSourceSonar) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	result, err := r.tryToDeleteCodebasePerfDataSourceSonar(i, *schema)
+	result, err := r.tryToDeleteCodebasePerfDataSourceSonar(ctx, i, *schema)
 	if err != nil || result != nil {
 		return *result, err
 	}
 
-	rl.Info("PerfDataSourceSonar reconciling has been finished successfully")
+	log.Info("PerfDataSourceSonar reconciling has been finished successfully")
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcilePerfDataSourceSonar) tryToDeleteCodebasePerfDataSourceSonar(ds *v1alpha1.PerfDataSourceSonar, schema string) (*reconcile.Result, error) {
+func (r *ReconcilePerfDataSourceSonar) tryToDeleteCodebasePerfDataSourceSonar(ctx context.Context,
+	ds *perfApi.PerfDataSourceSonar, schema string) (*reconcile.Result, error) {
 	if ds.GetDeletionTimestamp().IsZero() {
-		if !helper.ContainsString(ds.ObjectMeta.Finalizers, sonarDataSourceReconcilerFinalizerName) {
-			ds.ObjectMeta.Finalizers = append(ds.ObjectMeta.Finalizers, sonarDataSourceReconcilerFinalizerName)
-			if err := r.client.Update(context.TODO(), ds); err != nil {
+		if !helper.ContainsString(ds.ObjectMeta.Finalizers, sonarDataSourceReconcileFinalizerName) {
+			ds.ObjectMeta.Finalizers = append(ds.ObjectMeta.Finalizers, sonarDataSourceReconcileFinalizerName)
+			if err := r.client.Update(ctx, ds); err != nil {
 				return &reconcile.Result{}, err
 			}
 		}
@@ -105,7 +91,7 @@ func (r *ReconcilePerfDataSourceSonar) tryToDeleteCodebasePerfDataSourceSonar(ds
 
 	ow := cluster.GetOwnerReference(codebaseKind, ds.GetOwnerReferences())
 	if ow == nil {
-		log.Info("sonar data source doesn't contain Codebase owner reference", "data source", ds.Name)
+		r.log.Info("sonar data source doesn't contain Codebase owner reference", "data source", ds.Name)
 		return &reconcile.Result{RequeueAfter: 30 * time.Second}, nil
 	}
 
@@ -113,8 +99,8 @@ func (r *ReconcilePerfDataSourceSonar) tryToDeleteCodebasePerfDataSourceSonar(ds
 		return &reconcile.Result{}, err
 	}
 
-	ds.ObjectMeta.Finalizers = helper.RemoveString(ds.ObjectMeta.Finalizers, sonarDataSourceReconcilerFinalizerName)
-	if err := r.client.Update(context.TODO(), ds); err != nil {
+	ds.ObjectMeta.Finalizers = helper.RemoveString(ds.ObjectMeta.Finalizers, sonarDataSourceReconcileFinalizerName)
+	if err := r.client.Update(ctx, ds); err != nil {
 		return &reconcile.Result{}, err
 	}
 	return &reconcile.Result{}, nil

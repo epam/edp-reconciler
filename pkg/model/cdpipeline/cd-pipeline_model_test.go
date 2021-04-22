@@ -18,8 +18,8 @@ package cdpipeline
 
 import (
 	"fmt"
-	edpv1alpha1 "github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
+	edpv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
@@ -144,11 +144,11 @@ func TestCDPipelineActionMessages(t *testing.T) {
 			Username:        username,
 			DetailedMessage: detailedMessage,
 			Value:           "active",
-			Action:          edpv1alpha1.AcceptCDPipelineRegistration,
 			Result:          result,
 			Available:       true,
 			LastTimeUpdated: time.Now(),
 			Status:          event,
+			Action:          "accept_cd_pipeline_registration",
 		},
 	}
 
@@ -160,7 +160,7 @@ func TestCDPipelineActionMessages(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf(acceptCdPipelineRegistrationMsg, name), cdPipeline.ActionLog.ActionMessage,
 		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
 
-	k8sObj.Status.Action = edpv1alpha1.JenkinsConfiguration
+	k8sObj.Status.Action = "jenkins_configuration"
 	cdPipeline, err = ConvertToCDPipeline(k8sObj, edpName)
 	if err != nil {
 		t.Fatal(err)
@@ -176,15 +176,6 @@ func TestCDPipelineActionMessages(t *testing.T) {
 	}
 
 	assert.Equal(t, fmt.Sprintf(setupInitialStructureMsg, name), cdPipeline.ActionLog.ActionMessage,
-		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
-
-	k8sObj.Status.Action = edpv1alpha1.AcceptCDPipelineRegistration
-	cdPipeline, err = ConvertToCDPipeline(k8sObj, edpName)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, fmt.Sprintf(acceptCdPipelineRegistrationMsg, name), cdPipeline.ActionLog.ActionMessage,
 		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
 
 	k8sObj.Status = edpv1alpha1.CDPipelineStatus{}

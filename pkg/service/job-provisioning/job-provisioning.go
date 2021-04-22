@@ -2,14 +2,14 @@ package job_provisioning
 
 import (
 	"database/sql"
+	ctrl "sigs.k8s.io/controller-runtime"
 
-	jenkinsV2Api "github.com/epmd-edp/jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	jp "github.com/epmd-edp/reconciler/v2/pkg/repository/job-provisioning"
+	jenkinsV2Api "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
 
-var log = logf.Log.WithName("job-provisioning-service")
+var log = ctrl.Log.WithName("job-provisioning-service")
 
 type JobProvisionService struct {
 	DB *sql.DB

@@ -2,12 +2,12 @@ package jenkins_slave
 
 import (
 	"database/sql"
-	jenkinsV2Api "github.com/epmd-edp/jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/jenkins-slave"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	jenkinsV2Api "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("jenkins-slave-service")
+var log = ctrl.Log.WithName("jenkins-slave-service")
 
 type JenkinsSlaveService struct {
 	DB *sql.DB

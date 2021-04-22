@@ -2,46 +2,42 @@ package perfserver
 
 import (
 	"context"
-	"github.com/epmd-edp/perf-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	perfServerModel "github.com/epmd-edp/reconciler/v2/pkg/model/perfserver"
-	"github.com/epmd-edp/reconciler/v2/pkg/service/perfserver"
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	perfServerModel "github.com/epam/edp-reconciler/v2/pkg/model/perfserver"
+	"github.com/epam/edp-reconciler/v2/pkg/service/perfserver"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("controller_perf_server")
-
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+func NewReconcilePerfServer(client client.Client, log logr.Logger) *ReconcilePerfServer {
 	return &ReconcilePerfServer{
-		client:      mgr.GetClient(),
-		perfService: perfserver.PerfServerService{DB: db.Instance},
+		client: client,
+		perfService: perfserver.PerfServerService{
+			DB: db.Instance,
+		},
+		log: log.WithName("perf-server"),
 	}
 }
 
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	c, err := controller.New("perf-server-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
+type ReconcilePerfServer struct {
+	client      client.Client
+	perfService perfserver.PerfServerService
+	log         logr.Logger
+}
 
+func (r *ReconcilePerfServer) SetupWithManager(mgr ctrl.Manager) error {
 	p := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			oldObject := e.ObjectOld.(*v1alpha1.PerfServer)
-			newObject := e.ObjectNew.(*v1alpha1.PerfServer)
+			oldObject := e.ObjectOld.(*perfApi.PerfServer)
+			newObject := e.ObjectNew.(*perfApi.PerfServer)
 			if oldObject.Spec != newObject.Spec {
 				return true
 			}
@@ -52,25 +48,17 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		},
 	}
 
-	if err = c.Watch(&source.Kind{Type: &v1alpha1.PerfServer{}}, &handler.EnqueueRequestForObject{}, p); err != nil {
-		return err
-	}
-	return nil
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&perfApi.PerfServer{}, builder.WithPredicates(p)).
+		Complete(r)
 }
 
-var _ reconcile.Reconciler = &ReconcilePerfServer{}
+func (r *ReconcilePerfServer) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.Info("Reconciling PerfServer")
 
-type ReconcilePerfServer struct {
-	client      client.Client
-	perfService perfserver.PerfServerService
-}
-
-func (r *ReconcilePerfServer) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	rl := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	rl.Info("Reconciling PerfServer")
-
-	i := &v1alpha1.PerfServer{}
-	if err := r.client.Get(context.TODO(), request.NamespacedName, i); err != nil {
+	i := &perfApi.PerfServer{}
+	if err := r.client.Get(ctx, request.NamespacedName, i); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -86,6 +74,6 @@ func (r *ReconcilePerfServer) Reconcile(request reconcile.Request) (reconcile.Re
 		return reconcile.Result{}, err
 	}
 
-	rl.Info("PerfServer reconciling has been finished successfully")
+	log.Info("PerfServer reconciling has been finished successfully")
 	return reconcile.Result{}, nil
 }

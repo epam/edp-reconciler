@@ -1,7 +1,7 @@
 package model
 
 import (
-	edpComponentV1Api "github.com/epmd-edp/edp-component-operator/pkg/apis/v1/v1alpha1"
+	edpComponentV1Api "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"github.com/pkg/errors"
 )
 

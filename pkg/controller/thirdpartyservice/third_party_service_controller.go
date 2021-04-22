@@ -2,74 +2,55 @@ package thirdpartyservice
 
 import (
 	"context"
-	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	dtoService "github.com/epmd-edp/reconciler/v2/pkg/model/service"
-	tps "github.com/epmd-edp/reconciler/v2/pkg/service/thirdpartyservice"
+	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	dtoService "github.com/epam/edp-reconciler/v2/pkg/model/service"
+	tps "github.com/epam/edp-reconciler/v2/pkg/service/thirdpartyservice"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("service_controller")
-
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+func NewReconcileService(client client.Client, log logr.Logger) *ReconcileService {
 	return &ReconcileService{
-		client: mgr.GetClient(),
+		client: client,
 		tps: tps.ThirdPartyService{
 			DB: db.Instance,
 		},
+		log: log.WithName("third-party-service"),
 	}
 }
 
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("thirdpartyservice-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
+type ReconcileService struct {
+	client client.Client
+	tps    tps.ThirdPartyService
+	log    logr.Logger
+}
 
+func (r *ReconcileService) SetupWithManager(mgr ctrl.Manager) error {
 	p := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			return false
 		},
 	}
 
-	err = c.Watch(&source.Kind{Type: &edpv1alpha1Codebase.Service{}}, &handler.EnqueueRequestForObject{}, p)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&codebaseApi.Service{}, builder.WithPredicates(p)).
+		Complete(r)
 }
 
-var _ reconcile.Reconciler = &ReconcileService{}
+func (r *ReconcileService) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.Info("Reconciling ThirdPartyService CR")
 
-type ReconcileService struct {
-	client client.Client
-	tps    tps.ThirdPartyService
-}
-
-func (r *ReconcileService) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	rl := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	rl.Info("Reconciling ThirdPartyService CR")
-
-	instance := &edpv1alpha1Codebase.Service{}
-	if err := r.client.Get(context.TODO(), request.NamespacedName, instance); err != nil {
+	instance := &codebaseApi.Service{}
+	if err := r.client.Get(ctx, request.NamespacedName, instance); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -85,6 +66,6 @@ func (r *ReconcileService) Reconcile(request reconcile.Request) (reconcile.Resul
 	if err := r.tps.PutService(dto); err != nil {
 		return reconcile.Result{}, err
 	}
-	rl.Info("Reconciling ThirdPartyService CR has been finished")
+	log.Info("Reconciling ThirdPartyService CR has been finished")
 	return reconcile.Result{}, nil
 }

@@ -3,15 +3,15 @@ package codebasebranch
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/codebase"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/codebasebranch"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository"
-	cbs "github.com/epmd-edp/reconciler/v2/pkg/repository/codebasebranch"
+	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
+	"github.com/epam/edp-reconciler/v2/pkg/model/codebasebranch"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	cbs "github.com/epam/edp-reconciler/v2/pkg/repository/codebasebranch"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("codebase-branch-service")
+var log = ctrl.Log.WithName("codebase-branch-service")
 
 type CodebaseBranchService struct {
 	DB *sql.DB

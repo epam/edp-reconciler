@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/cdpipeline"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model/cdpipeline"
 )
 
 const (

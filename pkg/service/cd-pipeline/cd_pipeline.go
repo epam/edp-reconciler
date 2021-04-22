@@ -3,20 +3,20 @@ package cd_pipeline
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/cdpipeline"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/stage"
-	"github.com/epmd-edp/reconciler/v2/pkg/platform"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository"
-	sr "github.com/epmd-edp/reconciler/v2/pkg/repository/stage"
-	stageService "github.com/epmd-edp/reconciler/v2/pkg/service/stage"
-	"github.com/epmd-edp/reconciler/v2/pkg/service/thirdpartyservice"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model/cdpipeline"
+	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
+	"github.com/epam/edp-reconciler/v2/pkg/platform"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	sr "github.com/epam/edp-reconciler/v2/pkg/repository/stage"
+	stageService "github.com/epam/edp-reconciler/v2/pkg/service/stage"
+	"github.com/epam/edp-reconciler/v2/pkg/service/thirdpartyservice"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sort"
 )
 
-var log = logf.Log.WithName("cd_pipeline_service")
+var log = ctrl.Log.WithName("cd_pipeline_service")
 
 type CdPipelineService struct {
 	DB                *sql.DB

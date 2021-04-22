@@ -2,63 +2,47 @@ package job_provisioning
 
 import (
 	"context"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/go-logr/logr"
 	"reflect"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sort"
 	"time"
 
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	jp "github.com/epmd-edp/reconciler/v2/pkg/service/job-provisioning"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	jp "github.com/epam/edp-reconciler/v2/pkg/service/job-provisioning"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	jenkinsV2Api "github.com/epmd-edp/jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	errWrap "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("job_provisioning_controller")
-
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
-// Add creates a new JobProvisioning Controller and adds it to the Manager. The Manager will set fields on the Controller
-// and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+func NewReconcileJobProvision(client client.Client, log logr.Logger) *ReconcileJobProvision {
 	return &ReconcileJobProvision{
-		client: mgr.GetClient(),
-		JobProvisionService: jp.JobProvisionService{
+		client: client,
+		jobProvision: jp.JobProvisionService{
 			DB: db.Instance,
 		},
+		log: log.WithName("job-provision"),
 	}
 }
 
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("job-provisioning-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
+type ReconcileJobProvision struct {
+	client       client.Client
+	jobProvision jp.JobProvisionService
+	log          logr.Logger
+}
 
-	pred := predicate.Funcs{
+func (r *ReconcileJobProvision) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			old := e.ObjectOld.(*jenkinsV2Api.Jenkins).Status.JobProvisions
-			new := e.ObjectNew.(*jenkinsV2Api.Jenkins).Status.JobProvisions
+			old := e.ObjectOld.(*jenkinsApi.Jenkins).Status.JobProvisions
+			new := e.ObjectNew.(*jenkinsApi.Jenkins).Status.JobProvisions
 
 			sort.Slice(old, func(i, j int) bool {
 				return old[i].Name < old[j].Name
@@ -75,37 +59,17 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		},
 	}
 
-	// Watch for changes to primary resource Jenkins
-	err = c.Watch(&source.Kind{Type: &jenkinsV2Api.Jenkins{}}, &handler.EnqueueRequestForObject{}, pred)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&jenkinsApi.Jenkins{}, builder.WithPredicates(p)).
+		Complete(r)
 }
 
-var _ reconcile.Reconciler = &ReconcileJobProvision{}
+func (r *ReconcileJobProvision) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.Info("Reconciling Jenkins CR to handle Job Provisios")
 
-// ReconcileJobProvisioning reconciles a JenkinsCR object
-type ReconcileJobProvision struct {
-	client              client.Client
-	JobProvisionService jp.JobProvisionService
-}
-
-// Reconcile reads that state of the cluster for a Jenkins object and makes changes based on the state read
-// and what is in the Jenkins.Spec
-//
-// a Pod as an example
-// Note:
-// The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *ReconcileJobProvision) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling Jenkins CR to handle Job Provisios")
-
-	instance := &jenkinsV2Api.Jenkins{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
-	if err != nil {
+	instance := &jenkinsApi.Jenkins{}
+	if err := r.client.Get(ctx, request.NamespacedName, instance); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -117,7 +81,7 @@ func (r *ReconcileJobProvision) Reconcile(request reconcile.Request) (reconcile.
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	err = r.JobProvisionService.PutJobProvisions(jp, *edpN)
+	err = r.jobProvision.PutJobProvisions(jp, *edpN)
 	if err != nil {
 		return reconcile.Result{RequeueAfter: time.Second * 120},
 			errWrap.Wrapf(err, "an error has occurred while adding {%v} job provisions into DB", jp)

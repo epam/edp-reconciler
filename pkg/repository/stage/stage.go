@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/stage"
-	jp "github.com/epmd-edp/reconciler/v2/pkg/repository/job-provisioning"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
+	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
 )
 
 const (

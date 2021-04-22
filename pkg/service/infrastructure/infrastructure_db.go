@@ -3,12 +3,12 @@ package infrastructure
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("infrastructure-db-service")
+var log = ctrl.Log.WithName("infrastructure-db-service")
 
 type InfrastructureDbService struct {
 	DB *sql.DB

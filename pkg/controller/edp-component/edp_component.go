@@ -2,59 +2,45 @@ package edp_component
 
 import (
 	"context"
-	"github.com/epmd-edp/reconciler/v2/pkg/controller/helper"
-	"github.com/epmd-edp/reconciler/v2/pkg/db"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	ec "github.com/epmd-edp/reconciler/v2/pkg/service/edp-component"
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	ec "github.com/epam/edp-reconciler/v2/pkg/service/edp-component"
+	"github.com/go-logr/logr"
 	"reflect"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"time"
 
-	edpComponentV1Api "github.com/epmd-edp/edp-component-operator/pkg/apis/v1/v1alpha1"
+	edpCompApi "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("edp_component_controller")
-
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
-// Add creates a new JobProvisioning Controller and adds it to the Manager. The Manager will set fields on the Controller
-// and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
-
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+func NewEDPComponent(client client.Client, log logr.Logger) *EDPComponent {
 	return &EDPComponent{
-		client:              mgr.GetClient(),
-		EDPComponentService: ec.EDPComponentService{DB: db.Instance},
+		client: client,
+		component: ec.EDPComponentService{
+			DB: db.Instance,
+		},
+		log: log.WithName("edp-component"),
 	}
 }
 
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("edp-component-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
+type EDPComponent struct {
+	client    client.Client
+	component ec.EDPComponentService
+	log       logr.Logger
+}
 
-	pred := predicate.Funcs{
+func (r *EDPComponent) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			old := e.ObjectOld.(*edpComponentV1Api.EDPComponent).Spec
-			new := e.ObjectNew.(*edpComponentV1Api.EDPComponent).Spec
+			old := e.ObjectOld.(*edpCompApi.EDPComponent).Spec
+			new := e.ObjectNew.(*edpCompApi.EDPComponent).Spec
 
 			if reflect.DeepEqual(old, new) {
 				return false
@@ -63,37 +49,17 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		},
 	}
 
-	// Watch for changes to primary resource Jenkins
-	err = c.Watch(&source.Kind{Type: &edpComponentV1Api.EDPComponent{}}, &handler.EnqueueRequestForObject{}, pred)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&edpCompApi.EDPComponent{}, builder.WithPredicates(p)).
+		Complete(r)
 }
 
-var _ reconcile.Reconciler = &EDPComponent{}
+func (r *EDPComponent) Reconcile(ctx context.Context, request reconcile.Request) (reconcile.Result, error) {
+	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	log.Info("Reconciling EDPComponent CR")
 
-// EDPComponent reconciles a EDPComponent object
-type EDPComponent struct {
-	client              client.Client
-	EDPComponentService ec.EDPComponentService
-}
-
-// Reconcile reads that state of the cluster for a EDPComponent object and makes changes based on the state read
-// and what is in the Jenkins.Spec
-//
-// a Pod as an example
-// Note:
-// The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *EDPComponent) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling EDPComponent CR")
-
-	i := &edpComponentV1Api.EDPComponent{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, i)
-	if err != nil {
+	i := &edpCompApi.EDPComponent{}
+	if err := r.client.Get(ctx, request.NamespacedName, i); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
@@ -109,7 +75,7 @@ func (r *EDPComponent) Reconcile(request reconcile.Request) (reconcile.Result, e
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	err = r.EDPComponentService.PutEDPComponent(*c, *edpN)
+	err = r.component.PutEDPComponent(*c, *edpN)
 	if err != nil {
 		return reconcile.Result{RequeueAfter: time.Second * 120}, err
 	}

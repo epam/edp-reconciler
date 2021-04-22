@@ -2,17 +2,17 @@ package thirdpartyservice
 
 import (
 	"database/sql"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/service"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/thirdpartyservice"
+	"github.com/epam/edp-reconciler/v2/pkg/model/service"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/thirdpartyservice"
 	"github.com/pkg/errors"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type ThirdPartyService struct {
 	DB *sql.DB
 }
 
-var log = logf.Log.WithName("third-party-service-layer")
+var log = ctrl.Log.WithName("third-party-service-layer")
 
 func (s ThirdPartyService) PutService(service service.ServiceDto) error {
 	log.Info("start creating ThirdPartyService row in DB", "name", service.Name)

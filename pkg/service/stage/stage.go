@@ -1,21 +1,22 @@
 package stage
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"github.com/epmd-edp/cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	"github.com/epmd-edp/reconciler/v2/pkg/model/stage"
-	"github.com/epmd-edp/reconciler/v2/pkg/platform"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository"
-	"github.com/epmd-edp/reconciler/v2/pkg/repository/codebasebranch"
-	sr "github.com/epmd-edp/reconciler/v2/pkg/repository/stage"
+	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
+	"github.com/epam/edp-reconciler/v2/pkg/platform"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	"github.com/epam/edp-reconciler/v2/pkg/repository/codebasebranch"
+	sr "github.com/epam/edp-reconciler/v2/pkg/repository/stage"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("cd_stage_service")
+var log = ctrl.Log.WithName("cd_stage_service")
 
 type StageService struct {
 	DB        *sql.DB
@@ -193,7 +194,7 @@ func setOriginalInputImageStream(tx *sql.Tx, stage stage.Stage, codebaseName str
 func getOriginalInputImageStream(tx *sql.Tx, cdPipelineName, codebaseName, schemaName string) (*int, error) {
 	originalInputStream, err := repository.GetSourceInputStream(*tx, cdPipelineName, codebaseName, schemaName)
 	if err != nil {
-		return nil, errors.Wrapf(err, "couldn't fetch Original Input Stream for pipeline %v","codebase %v")
+		return nil, errors.Wrapf(err, "couldn't fetch Original Input Stream for pipeline %v", "codebase %v")
 	}
 	return originalInputStream, nil
 }
@@ -201,7 +202,7 @@ func getOriginalInputImageStream(tx *sql.Tx, cdPipelineName, codebaseName, schem
 func GetCDPipelineCR(edpRestClient *rest.RESTClient, crName string, namespace string) (*v1alpha1.CDPipeline, error) {
 	log.V(2).Info("trying to fetch CD Pipeline to get Applications To Promote", "pipe name", crName)
 	cdPipeline := &v1alpha1.CDPipeline{}
-	err := edpRestClient.Get().Namespace(namespace).Resource("cdpipelines").Name(crName).Do().Into(cdPipeline)
+	err := edpRestClient.Get().Namespace(namespace).Resource("cdpipelines").Name(crName).Do(context.TODO()).Into(cdPipeline)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has occurred while getting CD Pipeline CR from cluster")
 	}
@@ -230,7 +231,7 @@ func getInputDockerStreamsForArbitraryStage(tx *sql.Tx, id int, stage stage.Stag
 	log.V(2).Info("start reading input docker streams for the arbitrary stage with id: %v", id)
 	streams, err := repository.GetDockerStreamsByPipelineNameAndStageOrder(*tx, stage.Tenant, stage.CdPipelineName, stage.Order-1)
 	if err != nil {
-		return nil, errors.Wrapf(err, "an error has been occurred during the read docker streams %v",  "stage order %v")
+		return nil, errors.Wrapf(err, "an error has been occurred during the read docker streams %v", "stage order %v")
 	}
 	log.V(2).Info("streams have been successfully retrieved", "streams", streams)
 	return streams, nil

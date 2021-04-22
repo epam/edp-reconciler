@@ -19,11 +19,11 @@ package gitserver
 import (
 	"errors"
 	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epmd-edp/reconciler/v2/pkg/model"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"github.com/epam/edp-reconciler/v2/pkg/model"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-var log = logf.Log.WithName("git-server-model")
+var log = ctrl.Log.WithName("git-server-model")
 
 type GitServer struct {
 	GitHost                  string
