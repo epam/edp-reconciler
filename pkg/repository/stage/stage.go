@@ -53,6 +53,7 @@ const (
 		"left join \"%[1]v\".cd_stage cs on scds.cd_stage_id = cs.id " +
 		"left join \"%[1]v\".cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = $1 );"
+	updateStageTriggerType = "update \"%v\".cd_stage set trigger_type = $1 where id = $2;"
 	scope = "cd"
 )
 
@@ -232,4 +233,14 @@ func DeleteCodebaseDockerStreams(txn sql.Tx, pipeName, schema string) error {
 		return err
 	}
 	return nil
+}
+
+func UpdateStageTriggerType(txn sql.Tx,  id int, schemaName, triggerType string) error {
+	stmt, err := txn.Prepare(fmt.Sprintf(updateStageTriggerType, schemaName))
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(triggerType, id)
+	return err
 }

@@ -46,6 +46,12 @@ func (s StageService) PutStage(stage stage.Stage) error {
 		return errors.Wrapf(err, "cannot create stage %v", stage.Name)
 	}
 
+	log.Info("start update stage trigger type", "name", stage.Name)
+	if err := updateStageTriggerType(txn, id, stage.TriggerType, stage.Tenant); err != nil {
+		err = txn.Rollback()
+		return errors.Wrapf(err, "cannot update stage trigger type %v", stage.Name)
+	}
+
 	if err := updateStageStatus(txn, id, stage); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "cannot create stage %v", stage.Name)
@@ -426,5 +432,16 @@ func (s StageService) DeleteCDStage(pipeName, stageName, schema string) error {
 		return err
 	}
 	log.Info("cd stage was deleted", "pipe name", pipeName, "name", stageName)
+	return nil
+}
+
+func updateStageTriggerType(tx *sql.Tx, id *int, triggerType, tenant string) error {
+	log := log.WithValues("id", *id, "trigger_type", triggerType)
+	log.Info("start updating trigger type for stage")
+	err := sr.UpdateStageTriggerType(*tx, *id, tenant, triggerType)
+	if err != nil {
+		return errors.Wrapf(err, "an error has been occurred while updating stage trigger type: %v", id)
+	}
+	log.Info("trigger type has been updated")
 	return nil
 }
