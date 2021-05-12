@@ -8,24 +8,25 @@ import (
 )
 
 const (
-	InsertCDPipeline                  = "insert into \"%v\".cd_pipeline(name, status) VALUES ($1, $2) returning id, name, status;"
-	SelectCDPipeline                  = "select * from \"%v\".cd_pipeline cdp where cdp.name = $1 ;"
-	UpdateCDPipelineStatusQuery       = "update \"%v\".cd_pipeline set status = $1 where id = $2 ;"
-	InsertCDPipelineThirdPartyService = "insert into \"%v\".cd_pipeline_third_party_service(cd_pipeline_id, third_party_service_id) values ($1, $2) ;"
-	InsertCDPipelineDockerStream      = "insert into \"%v\".cd_pipeline_docker_stream(cd_pipeline_id, codebase_docker_stream_id) VALUES ($1, $2);"
-	DeleteAllDockerStreams            = "delete from \"%v\".cd_pipeline_docker_stream cpds  where cpds.cd_pipeline_id = $1 ;"
+	insertCDPipeline                  = "insert into \"%v\".cd_pipeline(name, deployment_type, status) VALUES ($1, $2, $3) returning id, name, deployment_type, status;"
+	selectCDPipeline                  = "select * from \"%v\".cd_pipeline cdp where cdp.name = $1 ;"
+	updateCDPipelineStatusQuery       = "update \"%v\".cd_pipeline set status = $1 where id = $2 ;"
+	insertCDPipelineThirdPartyService = "insert into \"%v\".cd_pipeline_third_party_service(cd_pipeline_id, third_party_service_id) values ($1, $2) ;"
+	insertCDPipelineDockerStream      = "insert into \"%v\".cd_pipeline_docker_stream(cd_pipeline_id, codebase_docker_stream_id) VALUES ($1, $2);"
+	deleteAllDockerStreams            = "delete from \"%v\".cd_pipeline_docker_stream cpds  where cpds.cd_pipeline_id = $1 ;"
 	deleteCDPipeline                  = "delete from \"%v\".cd_pipeline where name = $1 ;"
 )
 
-func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status string, schemaName string) (*model.CDPipelineDTO, error) {
-	stmt, err := txn.Prepare(fmt.Sprintf(InsertCDPipeline, schemaName))
+func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status, schema string) (*model.CDPipelineDTO, error) {
+	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipeline, schema))
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
 	var cdPipelineDto model.CDPipelineDTO
-	err = stmt.QueryRow(cdPipeline.Name, status).Scan(&cdPipelineDto.Id, &cdPipelineDto.Name, &cdPipelineDto.Status)
+	err = stmt.QueryRow(cdPipeline.Name, cdPipeline.DeploymentType, status).
+		Scan(&cdPipelineDto.Id, &cdPipelineDto.Name, &cdPipelineDto.DeploymentType, &cdPipelineDto.Status)
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +34,15 @@ func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status strin
 }
 
 func GetCDPipeline(txn sql.Tx, cdPipelineName string, schemaName string) (*model.CDPipelineDTO, error) {
-	stmt, err := txn.Prepare(fmt.Sprintf(SelectCDPipeline, schemaName))
+	stmt, err := txn.Prepare(fmt.Sprintf(selectCDPipeline, schemaName))
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
 	var cdPipeline model.CDPipelineDTO
-	err = stmt.QueryRow(cdPipelineName).Scan(&cdPipeline.Id, &cdPipeline.Name, &cdPipeline.Status)
+	err = stmt.QueryRow(cdPipelineName).
+		Scan(&cdPipeline.Id, &cdPipeline.Name, &cdPipeline.DeploymentType, &cdPipeline.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -51,7 +53,7 @@ func GetCDPipeline(txn sql.Tx, cdPipelineName string, schemaName string) (*model
 }
 
 func UpdateCDPipelineStatus(txn sql.Tx, pipelineId int, cdPipelineStatus string, schemaName string) error {
-	stmt, err := txn.Prepare(fmt.Sprintf(UpdateCDPipelineStatusQuery, schemaName))
+	stmt, err := txn.Prepare(fmt.Sprintf(updateCDPipelineStatusQuery, schemaName))
 	if err != nil {
 		return err
 	}
@@ -62,7 +64,7 @@ func UpdateCDPipelineStatus(txn sql.Tx, pipelineId int, cdPipelineStatus string,
 }
 
 func CreateCDPipelineThirdPartyService(txn sql.Tx, pipelineId int, serviceId int, schemaName string) error {
-	stmt, err := txn.Prepare(fmt.Sprintf(InsertCDPipelineThirdPartyService, schemaName))
+	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipelineThirdPartyService, schemaName))
 	if err != nil {
 		return err
 	}
@@ -73,7 +75,7 @@ func CreateCDPipelineThirdPartyService(txn sql.Tx, pipelineId int, serviceId int
 }
 
 func CreateCDPipelineDockerStream(txn sql.Tx, pipelineId int, dockerStreamId int, schemaName string) error {
-	stmt, err := txn.Prepare(fmt.Sprintf(InsertCDPipelineDockerStream, schemaName))
+	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipelineDockerStream, schemaName))
 	if err != nil {
 		return err
 	}
@@ -84,7 +86,7 @@ func CreateCDPipelineDockerStream(txn sql.Tx, pipelineId int, dockerStreamId int
 }
 
 func DeleteCDPipelineDockerStreams(txn sql.Tx, pipelineId int, schemaName string) error {
-	stmt, err := txn.Prepare(fmt.Sprintf(DeleteAllDockerStreams, schemaName))
+	stmt, err := txn.Prepare(fmt.Sprintf(deleteAllDockerStreams, schemaName))
 	if err != nil {
 		return err
 	}

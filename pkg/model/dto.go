@@ -6,9 +6,10 @@ type CodebaseBranchDTO struct {
 }
 
 type CDPipelineDTO struct {
-	Id     int
-	Name   string
-	Status string
+	Id             int
+	Name           string
+	DeploymentType string
+	Status         string
 }
 
 type CodebaseDockerStreamReadDTO struct {

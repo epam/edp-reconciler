@@ -33,6 +33,7 @@ type CDPipeline struct {
 	ActionLog             model.ActionLog
 	Status                string
 	ApplicationsToPromote []string
+	DeploymentType        string
 }
 
 var cdPipelineActionMessageMap = map[string]string{
@@ -62,6 +63,7 @@ func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDP
 		ActionLog:             *actionLog,
 		Status:                k8sObject.Status.Value,
 		ApplicationsToPromote: spec.ApplicationsToPromote,
+		DeploymentType:        spec.DeploymentType,
 	}
 
 	return &cdPipeline, nil

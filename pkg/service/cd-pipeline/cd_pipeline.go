@@ -34,18 +34,18 @@ func (s CdPipelineService) PutCDPipeline(cdPipeline cdpipeline.CDPipeline) error
 
 	cdPipelineDb, err := s.getCDPipelineOrCreate(txn, cdPipeline, schemaName)
 	if err != nil {
-		_ = txn.Rollback()
+		err = txn.Rollback()
 		return errors.Wrapf(err, "couldn't get/create cd pipeline %v", cdPipeline.Name)
 	}
 	log.Info("Id of CD Pipeline to be updated: %v", cdPipelineDb.Id)
 
 	if err := updateCDPipelineStatus(txn, *cdPipelineDb, cdPipeline.Status, schemaName); err != nil {
-		_ = txn.Rollback()
+		err = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred while updating %v CD Pipeline Status", cdPipelineDb.Name)
 	}
 
 	if err := updateActionLog(txn, cdPipeline, cdPipelineDb.Id, schemaName); err != nil {
-		_ = txn.Rollback()
+		err = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred while updating CD Pipelin %ve Action Event Log", cdPipeline.Name)
 	}
 
@@ -62,6 +62,7 @@ func (s CdPipelineService) getCDPipelineOrCreate(txn *sql.Tx, cdPipeline cdpipel
 	if err != nil {
 		return nil, err
 	}
+
 	if cdPipelineReadModel != nil {
 		if err := repository.DeleteCDPipelineDockerStreams(*txn, cdPipelineReadModel.Id, schemaName); err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while deleting pipeline's docker streams")
