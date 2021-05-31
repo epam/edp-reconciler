@@ -8,7 +8,6 @@ import (
 	"github.com/epam/edp-reconciler/v2/pkg/model/cdpipeline"
 	"github.com/epam/edp-reconciler/v2/pkg/platform"
 	"github.com/epam/edp-reconciler/v2/pkg/service/cd-pipeline"
-	tps "github.com/epam/edp-reconciler/v2/pkg/service/thirdpartyservice"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"reflect"
@@ -38,9 +37,6 @@ func NewReconcileCDPipeline(client client.Client, scheme *runtime.Scheme, log lo
 		pipe: cd_pipeline.CdPipelineService{
 			DB:        db.Instance,
 			ClientSet: *cs,
-			ThirdPartyService: tps.ThirdPartyService{
-				DB: db.Instance,
-			},
 		},
 		log: log.WithName("cd-pipeline"),
 	}, nil

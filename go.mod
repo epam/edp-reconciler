@@ -13,8 +13,8 @@ replace (
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210512085930-1e8d00147a91
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210427084710-6f9a5cbc8efe
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210531114116-985018377ff6
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210531100750-614060915d79
 	github.com/epam/edp-component-operator v0.1.1-0.20210427065236-c7dce7f4ea2b
 	github.com/epam/edp-gerrit-operator/v2 v2.3.0-73.0.20210427073621-8b07da9960b2
 	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210506123148-5202a61d3a6c

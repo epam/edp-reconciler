@@ -22,7 +22,6 @@ import (
 	"github.com/epam/edp-reconciler/v2/pkg/controller/perfdatasourcesonar"
 	perfserverCtrl "github.com/epam/edp-reconciler/v2/pkg/controller/perfserver"
 	"github.com/epam/edp-reconciler/v2/pkg/controller/stage"
-	"github.com/epam/edp-reconciler/v2/pkg/controller/thirdpartyservice"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
 	"os"
@@ -201,12 +200,6 @@ func main() {
 
 	if err := stageCtrl.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "cd-stage")
-		os.Exit(1)
-	}
-
-	serviceCtrl := thirdpartyservice.NewReconcileService(mgr.GetClient(), ctrlLog)
-	if err := serviceCtrl.SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "third-party-service")
 		os.Exit(1)
 	}
 

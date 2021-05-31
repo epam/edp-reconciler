@@ -10,7 +10,6 @@ import (
 	"github.com/epam/edp-reconciler/v2/pkg/repository"
 	sr "github.com/epam/edp-reconciler/v2/pkg/repository/stage"
 	stageService "github.com/epam/edp-reconciler/v2/pkg/service/stage"
-	"github.com/epam/edp-reconciler/v2/pkg/service/thirdpartyservice"
 	"github.com/pkg/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sort"
@@ -19,9 +18,8 @@ import (
 var log = ctrl.Log.WithName("cd_pipeline_service")
 
 type CdPipelineService struct {
-	DB                *sql.DB
-	ClientSet         platform.ClientSet
-	ThirdPartyService thirdpartyservice.ThirdPartyService
+	DB        *sql.DB
+	ClientSet platform.ClientSet
 }
 
 func (s CdPipelineService) PutCDPipeline(cdPipeline cdpipeline.CDPipeline) error {
@@ -106,20 +104,6 @@ func (s CdPipelineService) getCDPipelineOrCreate(txn *sql.Tx, cdPipeline cdpipel
 	if err := createCDPipelineDockerStream(txn, cdPipelineDTO.Id, cdPipeline.InputDockerStreams, schemaName); err != nil {
 		_ = txn.Rollback()
 		return nil, err
-	}
-
-	if cdPipeline.ThirdPartyServices != nil && len(cdPipeline.ThirdPartyServices) != 0 {
-		log.V(2).Info("try to create records in ThirdPartyServices", "values", cdPipeline.ThirdPartyServices)
-		servicesId, err := s.ThirdPartyService.GetServicesId(txn, cdPipeline.ThirdPartyServices, schemaName)
-		if err != nil {
-			_ = txn.Rollback()
-			return nil, errors.Wrap(err, "an error has occurred while getting services id:")
-		}
-
-		if err := createCDPipelineThirdPartyService(txn, cdPipelineDTO.Id, servicesId, schemaName); err != nil {
-			_ = txn.Rollback()
-			return nil, errors.Wrap(err, "an error has occurred while inserting record into cd_pipeline_third_party_service")
-		}
 	}
 
 	if err := createApplicationToPromoteRow(txn, cdPipelineDTO.Id, cdPipeline.ApplicationsToPromote, schemaName); err != nil {
@@ -247,16 +231,6 @@ func updateCDPipelineStatus(txn *sql.Tx, cdPipelineDb model.CDPipelineDTO, statu
 		log.V(2).Info("start updating status of cd pipeline",
 			"pipe name", cdPipelineDb.Name, "status", status)
 		if err := repository.UpdateCDPipelineStatus(*txn, cdPipelineDb.Id, status, schemaName); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func createCDPipelineThirdPartyService(txn *sql.Tx, cdPipelineId int, servicesId []int, schemaName string) error {
-	for _, serviceId := range servicesId {
-		err := repository.CreateCDPipelineThirdPartyService(*txn, cdPipelineId, serviceId, schemaName)
-		if err != nil {
 			return err
 		}
 	}

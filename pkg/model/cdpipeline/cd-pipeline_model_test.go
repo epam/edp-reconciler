@@ -31,7 +31,6 @@ const (
 	username              = "fake-user"
 	detailedMessage       = "fake-detailed-message"
 	inputDockerStream     = "fake-docker-stream-verified"
-	thirdPartyServices    = "rabbit-mq"
 	applicationsToPromote = "fake-application"
 	result                = "success"
 	cdPipelineAction      = "setup_initial_structure"
@@ -50,7 +49,6 @@ func TestConvertMethodToCDPipeline(t *testing.T) {
 		Spec: edpv1alpha1.CDPipelineSpec{
 			Name:                  name,
 			InputDockerStreams:    []string{inputDockerStream},
-			ThirdPartyServices:    []string{thirdPartyServices},
 			ApplicationsToPromote: []string{applicationsToPromote},
 		},
 		Status: edpv1alpha1.CDPipelineStatus{
@@ -75,8 +73,6 @@ func TestConvertMethodToCDPipeline(t *testing.T) {
 	}
 
 	checkSpecField(t, cdPipeline.InputDockerStreams, inputDockerStream, "input docker stream")
-
-	checkSpecField(t, cdPipeline.ThirdPartyServices, thirdPartyServices, "third party services")
 
 	checkSpecField(t, cdPipeline.ApplicationsToPromote, applicationsToPromote, "applications to promote")
 
@@ -137,7 +133,6 @@ func TestCDPipelineActionMessages(t *testing.T) {
 		Spec: edpv1alpha1.CDPipelineSpec{
 			Name:                  name,
 			InputDockerStreams:    []string{inputDockerStream},
-			ThirdPartyServices:    []string{thirdPartyServices},
 			ApplicationsToPromote: []string{applicationsToPromote},
 		},
 		Status: edpv1alpha1.CDPipelineStatus{

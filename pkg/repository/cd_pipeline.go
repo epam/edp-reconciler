@@ -8,13 +8,12 @@ import (
 )
 
 const (
-	insertCDPipeline                  = "insert into \"%v\".cd_pipeline(name, deployment_type, status) VALUES ($1, $2, $3) returning id, name, deployment_type, status;"
-	selectCDPipeline                  = "select * from \"%v\".cd_pipeline cdp where cdp.name = $1 ;"
-	updateCDPipelineStatusQuery       = "update \"%v\".cd_pipeline set status = $1 where id = $2 ;"
-	insertCDPipelineThirdPartyService = "insert into \"%v\".cd_pipeline_third_party_service(cd_pipeline_id, third_party_service_id) values ($1, $2) ;"
-	insertCDPipelineDockerStream      = "insert into \"%v\".cd_pipeline_docker_stream(cd_pipeline_id, codebase_docker_stream_id) VALUES ($1, $2);"
-	deleteAllDockerStreams            = "delete from \"%v\".cd_pipeline_docker_stream cpds  where cpds.cd_pipeline_id = $1 ;"
-	deleteCDPipeline                  = "delete from \"%v\".cd_pipeline where name = $1 ;"
+	insertCDPipeline             = "insert into \"%v\".cd_pipeline(name, deployment_type, status) VALUES ($1, $2, $3) returning id, name, deployment_type, status;"
+	selectCDPipeline             = "select * from \"%v\".cd_pipeline cdp where cdp.name = $1 ;"
+	updateCDPipelineStatusQuery  = "update \"%v\".cd_pipeline set status = $1 where id = $2 ;"
+	insertCDPipelineDockerStream = "insert into \"%v\".cd_pipeline_docker_stream(cd_pipeline_id, codebase_docker_stream_id) VALUES ($1, $2);"
+	deleteAllDockerStreams       = "delete from \"%v\".cd_pipeline_docker_stream cpds  where cpds.cd_pipeline_id = $1 ;"
+	deleteCDPipeline             = "delete from \"%v\".cd_pipeline where name = $1 ;"
 )
 
 func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status, schema string) (*model.CDPipelineDTO, error) {
@@ -60,17 +59,6 @@ func UpdateCDPipelineStatus(txn sql.Tx, pipelineId int, cdPipelineStatus string,
 	defer stmt.Close()
 
 	_, err = stmt.Exec(cdPipelineStatus, pipelineId)
-	return err
-}
-
-func CreateCDPipelineThirdPartyService(txn sql.Tx, pipelineId int, serviceId int, schemaName string) error {
-	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipelineThirdPartyService, schemaName))
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(pipelineId, serviceId)
 	return err
 }
 

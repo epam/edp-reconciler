@@ -29,7 +29,6 @@ type CDPipeline struct {
 	Tenant                string
 	CodebaseBranch        []string
 	InputDockerStreams    []string
-	ThirdPartyServices    []string
 	ActionLog             model.ActionLog
 	Status                string
 	ApplicationsToPromote []string
@@ -59,7 +58,6 @@ func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDP
 		Namespace:             k8sObject.Namespace,
 		Tenant:                edpName,
 		InputDockerStreams:    spec.InputDockerStreams,
-		ThirdPartyServices:    spec.ThirdPartyServices,
 		ActionLog:             *actionLog,
 		Status:                k8sObject.Status.Value,
 		ApplicationsToPromote: spec.ApplicationsToPromote,
