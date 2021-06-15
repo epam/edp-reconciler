@@ -13,12 +13,12 @@ replace (
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210531114116-985018377ff6
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210531100750-614060915d79
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210615093126-97b0e89e0aa8
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210615090821-27e73211c5f4
 	github.com/epam/edp-component-operator v0.1.1-0.20210427065236-c7dce7f4ea2b
 	github.com/epam/edp-gerrit-operator/v2 v2.3.0-73.0.20210427073621-8b07da9960b2
-	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210506123148-5202a61d3a6c
-	github.com/epam/edp-perf-operator/v2 v2.0.0-20210427075221-451577e1e5f2
+	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210611080440-fd54e8b0eda3
+	github.com/epam/edp-perf-operator/v2 v2.0.0-20210615084859-4e4202d10e93
 	github.com/go-logr/logr v0.4.0
 	github.com/lib/pq v1.8.0
 	github.com/openshift/client-go v3.9.0+incompatible
