@@ -67,26 +67,23 @@ func (r *ReconcileJenkinsSlave) Reconcile(ctx context.Context, request reconcile
 	log := r.log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	log.Info("Reconciling Jenkins")
 
-	instance := &jenkinsApi.Jenkins{}
-	if err := r.client.Get(ctx, request.NamespacedName, instance); err != nil {
+	jenkins := &jenkinsApi.Jenkins{}
+	if err := r.client.Get(ctx, request.NamespacedName, jenkins); err != nil {
 		if errors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
 		return reconcile.Result{}, err
 	}
+	log.WithValues("Jenkins", jenkins)
 
-	log.WithValues("Jenkins", instance)
-
-	cs := instance.Status.Slaves
-
-	edpN, err := helper.GetEDPName(r.client, instance.Namespace)
+	edpN, err := helper.GetEDPName(r.client, jenkins.Namespace)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	err = r.jenkinsSlave.CreateSlavesOrDoNothing(cs, *edpN)
-	if err != nil {
+
+	if err := r.jenkinsSlave.CreateSlavesOrDoNothing(jenkins.Status.Slaves, *edpN); err != nil {
 		return reconcile.Result{RequeueAfter: time.Second * 120},
-			errWrap.Wrapf(err, "an error has occurred while adding {%v} slaves into DB", cs)
+			errWrap.Wrapf(err, "an error has occurred while adding {%v} slaves into DB", jenkins.Status.Slaves)
 	}
 
 	return reconcile.Result{}, nil
