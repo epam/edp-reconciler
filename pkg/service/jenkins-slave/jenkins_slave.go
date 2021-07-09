@@ -20,11 +20,15 @@ func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave
 	if err != nil {
 		return err
 	}
+	defer txn.Rollback()
 
 	for _, s := range slaves {
+		if len(s.Name) == 0 {
+			continue
+		}
+
 		id, err := jenkins_slave.SelectJenkinsSlave(*txn, s.Name, schemaName)
 		if err != nil {
-			_ = txn.Rollback()
 			return err
 		}
 
@@ -33,15 +37,12 @@ func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave
 			continue
 		}
 
-		err = jenkins_slave.CreateJenkinsSlave(*txn, s.Name, schemaName)
-		if err != nil {
-			_ = txn.Rollback()
+		if err := jenkins_slave.CreateJenkinsSlave(*txn, s.Name, schemaName); err != nil {
 			return err
 		}
 	}
 
-	err = txn.Commit()
-	if err != nil {
+	if err := txn.Commit(); err != nil {
 		return err
 	}
 
