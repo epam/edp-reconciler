@@ -134,13 +134,8 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 		c.RepositoryUrl = ""
 	}
 
-	if s.Route != nil {
-		c.RouteSite = s.Route.Site
-		c.RoutePath = s.Route.Path
-	} else {
-		c.RouteSite = ""
-		c.RoutePath = ""
-	}
+	c.RouteSite = ""
+	c.RoutePath = ""
 
 	if s.Description != nil {
 		c.Description = *s.Description
