@@ -8,20 +8,24 @@ import (
 )
 
 const (
-	insertCodebase = "insert into \"%v\".codebase(name, type, language, framework, build_tool, strategy, repository_url, route_site," +
-		" route_path, status, test_report_framework, description," +
-		" git_server_id, git_project_path, jenkins_slave_id, job_provisioning_id, deployment_script, project_status, versioning_type," +
-		" start_versioning_from, jira_server_id, commit_message_pattern, ticket_name_pattern, ci_tool, perf_server_id, default_branch," +
-		" jira_issue_metadata_payload, empty_project)" +
-		" values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18," +
-		" $19, $20, $21, $22, $23, $24, $25, $26, $27, $28) returning id;"
+	insertCodebase = `insert into "%v".codebase(name, type, language, framework, build_tool, strategy, repository_url, route_site,
+		route_path, status, test_report_framework, description,
+		git_server_id, git_project_path, jenkins_slave_id, job_provisioning_id, deployment_script, project_status, versioning_type,
+		start_versioning_from, jira_server_id, commit_message_pattern, ticket_name_pattern, ci_tool, perf_server_id, default_branch,
+		jira_issue_metadata_payload, empty_project)
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
+		$19, $20, $21, $22, $23, $24, $25, $26, $27, $28) returning id;`
 	selectCodebase       = "select id from \"%v\".codebase where name=$1;"
 	selectCodebaseType   = "select type from \"%v\".codebase where id=$1;"
 	updateCodebaseStatus = "update \"%v\".codebase set status = $1 where id = $2;"
 	selectApplication    = "select id from \"%v\".codebase where name=$1 and type='application';"
 	deleteCodebase       = "delete from \"%v\".codebase where name=$1;"
-	updateCodebase       = "update \"%v\".codebase set commit_message_pattern = $1, ticket_name_pattern = $2," +
-		" jira_issue_metadata_payload = $3, jira_server_id = $4 where name = $5;"
+	updateCodebase       = `update "%v".codebase set type = $1, language = $2, framework = $3, build_tool = $4, 
+		strategy = $5, repository_url = $6, route_site = $7, route_path = $8, status = $9, test_report_framework = $10, 
+		description = $11, git_server_id = $12, git_project_path = $13, jenkins_slave_id = $14, job_provisioning_id = $15, 
+		deployment_script = $16, project_status = $17, versioning_type = $18, start_versioning_from = $19, 
+		jira_server_id = $20, commit_message_pattern = $21, ticket_name_pattern = $22, ci_tool = $23, perf_server_id = $24, 
+		default_branch = $25, jira_issue_metadata_payload = $26, empty_project = $27 where name = $28;`
 )
 
 const (
@@ -157,7 +161,14 @@ func Update(txn sql.Tx, c codebase.Codebase, schema string) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(getStringOrNil(c.CommitMessagePattern), getStringOrNil(c.TicketNamePattern),
-		getStringOrNil(c.JiraIssueMetadataPayload), getIntOrNil(c.JiraServerId), c.Name)
+	_, err = stmt.Exec(c.Type, strings.ToLower(c.Language), c.Framework,
+		strings.ToLower(c.BuildTool), strings.ToLower(c.Strategy), c.RepositoryUrl, c.RouteSite, c.RoutePath,
+		c.Status, c.TestReportFramework, c.Description,
+		getIntOrNil(c.GitServerId), getStringOrNil(c.GitUrlPath), getIntOrNil(c.JenkinsSlaveId),
+		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, getStatus(c.Strategy), c.VersioningType,
+		c.StartVersioningFrom, getIntOrNil(c.JiraServerId), getStringOrNil(c.CommitMessagePattern),
+		getStringOrNil(c.TicketNamePattern), c.CiTool, getPerfIdOrNil(c.Perf), c.DefaultBranch,
+		getStringOrNil(c.JiraIssueMetadataPayload), c.EmptyProject, c.Name)
+
 	return err
 }
