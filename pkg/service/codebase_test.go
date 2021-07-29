@@ -6,8 +6,9 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/epam/edp-perf-operator/v2/pkg/util/common"
 	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
-	jenkins_slave "github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
-	job_provisioning "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
+	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	js "github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
+	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -38,7 +39,7 @@ func TestSetJobProvisioningId_ShouldBeExecutedSuccessfully(t *testing.T) {
 
 	schema := "public"
 	mock.ExpectBegin()
-	mock.ExpectPrepare(fmt.Sprintf(job_provisioning.SelectJobProvisioningSql, schema)).
+	mock.ExpectPrepare(fmt.Sprintf(jp.SelectJobProvisioningSql, schema)).
 		ExpectQuery().
 		WithArgs("default", "ci").
 		WillReturnRows(sqlmock.NewRows([]string{"col"}).AddRow(1))
@@ -61,7 +62,7 @@ func TestSetJobProvisioningId_ShouldReturnAnError(t *testing.T) {
 
 	schema := "public"
 	mock.ExpectBegin()
-	mock.ExpectPrepare(fmt.Sprintf(job_provisioning.SelectJobProvisioningSql, schema)).
+	mock.ExpectPrepare(fmt.Sprintf(jp.SelectJobProvisioningSql, schema)).
 		ExpectQuery().
 		WithArgs("default", "ci").
 		WillReturnError(errors.New("error"))
@@ -85,7 +86,6 @@ func TestSetJenkinsSlaveId_JenkinsSlaveIsNilShouldBeExecutedSuccessfully(t *test
 
 	err := setJenkinsSlaveId(nil, c, schema)
 	assert.NoError(t, err)
-	println(c.JenkinsSlaveId)
 	assert.Nil(t, c.JenkinsSlaveId)
 }
 
@@ -94,7 +94,7 @@ func TestSetJenkinsSlaveId_ShouldBeExecutedSuccessfully(t *testing.T) {
 
 	schema := "public"
 	mock.ExpectBegin()
-	mock.ExpectPrepare(fmt.Sprintf(jenkins_slave.SelectJenkinsSlaveSql, schema)).
+	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
 		ExpectQuery().
 		WithArgs("default").
 		WillReturnRows(sqlmock.NewRows([]string{"col"}).AddRow(1))
@@ -117,7 +117,7 @@ func TestSetJenkinsSlaveId_ShouldReturnAnError(t *testing.T) {
 
 	schema := "public"
 	mock.ExpectBegin()
-	mock.ExpectPrepare(fmt.Sprintf(jenkins_slave.SelectJenkinsSlaveSql, schema)).
+	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
 		ExpectQuery().
 		WithArgs("default", "ci").
 		WillReturnError(errors.New("error"))
@@ -131,5 +131,110 @@ func TestSetJenkinsSlaveId_ShouldReturnAnError(t *testing.T) {
 	}
 
 	err = setJenkinsSlaveId(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestUpdateCodebase_SelectJenkinsSlaveShouldReturnAnError(t *testing.T) {
+	schema := "public"
+	db, mock := newMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(nil))
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := codebase.Codebase{
+		JenkinsSlave: common.GetStringP("default"),
+	}
+
+	err = updateCodebase(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestUpdateCodebase_SelectJobProvisioningShouldReturnAnError(t *testing.T) {
+	schema := "public"
+	db, mock := newMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(1))
+	mock.ExpectPrepare(fmt.Sprintf(jp.SelectJobProvisioningSql, schema)).
+		ExpectQuery().
+		WithArgs("default", "ci").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(nil))
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := codebase.Codebase{
+		JenkinsSlave:    common.GetStringP("default"),
+		JobProvisioning: common.GetStringP("default"),
+	}
+
+	err = updateCodebase(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestCreateCodebase_SelectGitServerShouldReturnAnError(t *testing.T) {
+	schema := "public"
+	db, mock := newMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := codebase.Codebase{
+		GitServer:    "default",
+		JenkinsSlave: common.GetStringP("default"),
+	}
+
+	_, err = CodebaseService{}.createBE(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestCreateCodebase_SelectJobProvisioningShouldReturnAnError1(t *testing.T) {
+	schema := "public"
+	db, mock := newMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+
+	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(1))
+	mock.ExpectPrepare(fmt.Sprintf(jp.SelectJobProvisioningSql, schema)).
+		ExpectQuery().
+		WithArgs("default", "ci").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(nil))
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := codebase.Codebase{
+		GitServer:    "default",
+		JenkinsSlave: common.GetStringP("default"),
+	}
+
+	_, err = CodebaseService{}.createBE(tx, c, schema)
 	assert.Error(t, err)
 }
