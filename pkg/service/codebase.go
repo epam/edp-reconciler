@@ -100,13 +100,12 @@ func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 		c.JiraServerId = id
 	}
 
-	if c.JobProvisioning != nil && *c.JobProvisioning != "" {
-		jpId, err := jp.SelectJobProvision(*txn, *c.JobProvisioning, "ci", schema)
-		if err != nil || jpId == nil {
-			return errors.Wrapf(err, "couldn't get job provisioning id: %v", c.JobProvisioning)
-		}
-		log.Printf("Job Probisioning Id for %v codebase is %v", c.Name, *jpId)
-		c.JobProvisioningId = jpId
+	if err := setJenkinsSlaveId(txn, &c, schema); err != nil {
+		return err
+	}
+
+	if err := setJobProvisioningId(txn, &c, schema); err != nil {
+		return err
 	}
 
 	if err := repository.Update(*txn, c, schema); err != nil {
@@ -116,10 +115,39 @@ func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 	return nil
 }
 
-func (s CodebaseService) createBE(txn *sql.Tx, c codebase.Codebase, schemaName string) (*int, error) {
+func setJenkinsSlaveId(txn *sql.Tx, c *codebase.Codebase, schema string) error {
+	if c.JenkinsSlave == nil || (c.JenkinsSlave != nil && *c.JenkinsSlave == "") {
+		return nil
+	}
+
+	jsId, err := jenkins_slave.SelectJenkinsSlave(*txn, *c.JenkinsSlave, schema)
+	if err != nil || jsId == nil {
+		return errors.New(fmt.Sprintf("couldn't get jenkins slave id: %v", c.JenkinsSlave))
+	}
+	log.Printf("Jenkins Slave Id for %v codebase is %v", c.Name, *jsId)
+
+	c.JenkinsSlaveId = jsId
+	return nil
+}
+
+func setJobProvisioningId(txn *sql.Tx, c *codebase.Codebase, schema string) error {
+	if c.JobProvisioning == nil || (c.JobProvisioning != nil && *c.JobProvisioning == "") {
+		return nil
+	}
+
+	jpId, err := jp.SelectJobProvision(*txn, *c.JobProvisioning, "ci", schema)
+	if err != nil || jpId == nil {
+		return errors.Wrapf(err, "couldn't get job provisioning id: %v", c.JobProvisioning)
+	}
+	log.Printf("Job Probisioning Id for %v codebase is %v", c.Name, *jpId)
+	c.JobProvisioningId = jpId
+	return nil
+}
+
+func (s CodebaseService) createBE(txn *sql.Tx, c codebase.Codebase, schema string) (*int, error) {
 	log.Println("Start insertion in the repository business entity...")
 
-	serverId, err := getGitServerId(txn, c.GitServer, schemaName)
+	serverId, err := getGitServerId(txn, c.GitServer, schema)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("cannot get git server: %v", c.GitServer))
 	}
@@ -129,7 +157,7 @@ func (s CodebaseService) createBE(txn *sql.Tx, c codebase.Codebase, schemaName s
 	}
 	c.GitServerId = serverId
 
-	id, err := getJiraServerId(txn, c.JiraServer, schemaName)
+	id, err := getJiraServerId(txn, c.JiraServer, schema)
 	if err != nil {
 		return nil, errors.Wrapf(err, "couldn't get Jira server id by %v name", *c.JiraServer)
 	}
@@ -137,32 +165,19 @@ func (s CodebaseService) createBE(txn *sql.Tx, c codebase.Codebase, schemaName s
 		c.JiraServerId = id
 	}
 
-	if c.JenkinsSlave != nil && *c.JenkinsSlave != "" {
-		jsId, err := jenkins_slave.SelectJenkinsSlave(*txn, *c.JenkinsSlave, schemaName)
-		if err != nil || jsId == nil {
-			return nil, errors.New(fmt.Sprintf("couldn't get jenkins slave id: %v", c.JenkinsSlave))
-		}
-		log.Printf("Jenkins Slave Id for %v codebase is %v", c.Name, *jsId)
-
-		c.JenkinsSlaveId = jsId
+	if err := setJenkinsSlaveId(txn, &c, schema); err != nil {
+		return nil, err
 	}
 
-	if c.JobProvisioning != nil && *c.JobProvisioning != "" {
-		jpId, err := jp.SelectJobProvision(*txn, *c.JobProvisioning, "ci", schemaName)
-		if err != nil || jpId == nil {
-			return nil, errors.New(fmt.Sprintf("couldn't get job provisioning id: %v", c.JobProvisioning))
-		}
-
-		log.Printf("Job Probisioning Id for %v codebase is %v", c.Name, *jpId)
-
-		c.JobProvisioningId = jpId
+	if err := setJobProvisioningId(txn, &c, schema); err != nil {
+		return nil, err
 	}
 
-	if err := s.setPerfServerIdToCodebaseDto(c.Perf, schemaName); err != nil {
+	if err := s.setPerfServerIdToCodebaseDto(c.Perf, schema); err != nil {
 		return nil, errors.Wrapf(err, "couldn't set %v perf server id", c.Perf.Name)
 	}
 
-	id, err = repository.CreateCodebase(*txn, c, schemaName)
+	id, err = repository.CreateCodebase(*txn, c, schema)
 	if err != nil {
 		log.Printf("Error has occurred during business entity creation: %v", err)
 		return nil, errors.New(fmt.Sprintf("cannot create business entity %v", c))
