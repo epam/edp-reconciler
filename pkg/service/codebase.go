@@ -100,6 +100,15 @@ func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 		c.JiraServerId = id
 	}
 
+	if c.JobProvisioning != nil && *c.JobProvisioning != "" {
+		jpId, err := jp.SelectJobProvision(*txn, *c.JobProvisioning, "ci", schema)
+		if err != nil || jpId == nil {
+			return errors.Wrapf(err, "couldn't get job provisioning id: %v", c.JobProvisioning)
+		}
+		log.Printf("Job Probisioning Id for %v codebase is %v", c.Name, *jpId)
+		c.JobProvisioningId = jpId
+	}
+
 	if err := repository.Update(*txn, c, schema); err != nil {
 		return errors.Wrapf(err, "couldn't update codebase %v", c.Name)
 	}
