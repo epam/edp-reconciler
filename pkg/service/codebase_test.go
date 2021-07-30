@@ -139,6 +139,10 @@ func TestUpdateCodebase_SelectJenkinsSlaveShouldReturnAnError(t *testing.T) {
 	db, mock := newMock()
 
 	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(1))
 	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
 		ExpectQuery().
 		WithArgs("default").
@@ -149,6 +153,7 @@ func TestUpdateCodebase_SelectJenkinsSlaveShouldReturnAnError(t *testing.T) {
 	}
 
 	c := codebase.Codebase{
+		GitServer:    "default",
 		JenkinsSlave: common.GetStringP("default"),
 	}
 
@@ -161,6 +166,10 @@ func TestUpdateCodebase_SelectJobProvisioningShouldReturnAnError(t *testing.T) {
 	db, mock := newMock()
 
 	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(1))
 	mock.ExpectPrepare(fmt.Sprintf(js.SelectJenkinsSlaveSql, schema)).
 		ExpectQuery().
 		WithArgs("default").
@@ -175,6 +184,7 @@ func TestUpdateCodebase_SelectJobProvisioningShouldReturnAnError(t *testing.T) {
 	}
 
 	c := codebase.Codebase{
+		GitServer:       "default",
 		JenkinsSlave:    common.GetStringP("default"),
 		JobProvisioning: common.GetStringP("default"),
 	}
@@ -236,5 +246,72 @@ func TestCreateCodebase_SelectJobProvisioningShouldReturnAnError1(t *testing.T) 
 	}
 
 	_, err = CodebaseService{}.createBE(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestSetGitServerId_ShouldBeExecutedSuccessfully(t *testing.T) {
+	db, mock := newMock()
+	schema := "public"
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow(1))
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := &codebase.Codebase{
+		GitServer: "default",
+	}
+
+	err = setGitServerId(tx, c, schema)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, *c.GitServerId)
+}
+
+func TestSetGitServerId_RepositoryShouldReturnAnError(t *testing.T) {
+	db, mock := newMock()
+	schema := "public"
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnError(sql.ErrConnDone)
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := &codebase.Codebase{
+		GitServer: "default",
+	}
+
+	err = setGitServerId(tx, c, schema)
+	assert.Error(t, err)
+}
+
+func TestSetGitServerId_GitServerShouldNotBeFound(t *testing.T) {
+	db, mock := newMock()
+	schema := "public"
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(fmt.Sprintf(repository.SelectGitServerSql, schema)).
+		ExpectQuery().
+		WithArgs("default").
+		WillReturnError(sql.ErrNoRows)
+	tx, err := db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c := &codebase.Codebase{
+		GitServer: "default",
+	}
+
+	err = setGitServerId(tx, c, schema)
 	assert.Error(t, err)
 }

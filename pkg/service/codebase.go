@@ -92,6 +92,10 @@ func (s CodebaseService) putCodebase(txn *sql.Tx, c codebase.Codebase, schema st
 func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 	log.Printf("start updating codebase %v", c.Name)
 
+	if err := setGitServerId(txn, &c, schema); err != nil {
+		return err
+	}
+
 	id, err := getJiraServerId(txn, c.JiraServer, schema)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get Jira server id by %v name", *c.JiraServer)
@@ -112,6 +116,20 @@ func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 		return errors.Wrapf(err, "couldn't update codebase %v", c.Name)
 	}
 	log.Printf("codebase %v has been updated", c.Name)
+	return nil
+}
+
+func setGitServerId(txn *sql.Tx, c *codebase.Codebase, schema string) error {
+	serverId, err := getGitServerId(txn, c.GitServer, schema)
+	if err != nil {
+		return errors.Wrapf(err, "cannot get git server: %v", c.GitServer)
+	}
+	log.Printf("GitServer is fetched: %v", serverId)
+	if serverId == nil {
+		return fmt.Errorf("git server has not been found for %v", c.GitServer)
+	}
+	c.GitServerId = serverId
+
 	return nil
 }
 
