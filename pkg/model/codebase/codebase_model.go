@@ -41,8 +41,6 @@ type Codebase struct {
 	BuildTool                string
 	Strategy                 string
 	RepositoryUrl            string
-	RouteSite                string
-	RoutePath                string
 	ActionLog                model.ActionLog
 	Description              string
 	TestReportFramework      string
@@ -132,14 +130,6 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 		c.RepositoryUrl = s.Repository.Url
 	} else {
 		c.RepositoryUrl = ""
-	}
-
-	if s.Route != nil {
-		c.RouteSite = s.Route.Site
-		c.RoutePath = s.Route.Path
-	} else {
-		c.RouteSite = ""
-		c.RoutePath = ""
 	}
 
 	if s.Description != nil {
