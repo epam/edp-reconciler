@@ -3,8 +3,9 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
 	"strings"
+
+	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
 )
 
 const (
@@ -23,9 +24,9 @@ const (
 	updateCodebase       = `update "%v".codebase set type = $1, language = $2, framework = $3, build_tool = $4, 
 		strategy = $5, repository_url = $6, status = $7, test_report_framework = $8, 
 		description = $9, git_server_id = $10, git_project_path = $11, jenkins_slave_id = $12, job_provisioning_id = $13, 
-		deployment_script = $14, project_status = $15, versioning_type = $16, start_versioning_from = $17, 
-		jira_server_id = $18, commit_message_pattern = $19, ticket_name_pattern = $20, ci_tool = $21, perf_server_id = $22, 
-		default_branch = $23, jira_issue_metadata_payload = $24, empty_project = $25 where name = $26;`
+		deployment_script = $14, versioning_type = $15, start_versioning_from = $16, 
+		jira_server_id = $17, commit_message_pattern = $18, ticket_name_pattern = $19, ci_tool = $20, perf_server_id = $21, 
+		default_branch = $22, jira_issue_metadata_payload = $23, empty_project = $24 where name = $25;`
 )
 
 const (
@@ -165,7 +166,7 @@ func Update(txn sql.Tx, c codebase.Codebase, schema string) error {
 		strings.ToLower(c.BuildTool), strings.ToLower(c.Strategy), c.RepositoryUrl,
 		c.Status, c.TestReportFramework, c.Description,
 		getIntOrNil(c.GitServerId), getStringOrNil(c.GitUrlPath), getIntOrNil(c.JenkinsSlaveId),
-		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, getStatus(c.Strategy), c.VersioningType,
+		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, c.VersioningType,
 		c.StartVersioningFrom, getIntOrNil(c.JiraServerId), getStringOrNil(c.CommitMessagePattern),
 		getStringOrNil(c.TicketNamePattern), c.CiTool, getPerfIdOrNil(c.Perf), c.DefaultBranch,
 		getStringOrNil(c.JiraIssueMetadataPayload), c.EmptyProject, c.Name)

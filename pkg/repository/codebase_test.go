@@ -36,7 +36,7 @@ func TestUpdate(t *testing.T) {
 		strings.ToLower(c.BuildTool), strings.ToLower(c.Strategy), c.RepositoryUrl,
 		c.Status, c.TestReportFramework, c.Description,
 		getIntOrNil(c.GitServerId), getStringOrNil(c.GitUrlPath), getIntOrNil(c.JenkinsSlaveId),
-		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, getStatus(c.Strategy), c.VersioningType,
+		getIntOrNil(c.JobProvisioningId), c.DeploymentScript, c.VersioningType,
 		c.StartVersioningFrom, getIntOrNil(c.JiraServerId), getStringOrNil(c.CommitMessagePattern),
 		getStringOrNil(c.TicketNamePattern), c.CiTool, getPerfIdOrNil(c.Perf), c.DefaultBranch,
 		getStringOrNil(c.JiraIssueMetadataPayload), c.EmptyProject, c.Name).WillReturnResult(sqlmock.NewResult(1, 1))
