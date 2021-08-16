@@ -35,7 +35,7 @@ func (s CdPipelineService) PutCDPipeline(cdPipeline cdpipeline.CDPipeline) error
 		err = txn.Rollback()
 		return errors.Wrapf(err, "couldn't get/create cd pipeline %v", cdPipeline.Name)
 	}
-	log.Info("Id of CD Pipeline to be updated: %v", cdPipelineDb.Id)
+	log.Info("CD Pipeline has been retrieved", "id", cdPipelineDb.Id)
 
 	if err := updateCDPipelineStatus(txn, *cdPipelineDb, cdPipeline.Status, schemaName); err != nil {
 		err = txn.Rollback()
