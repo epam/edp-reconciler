@@ -2,9 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  namespace: {{ .Values.global.edpName }}
   labels:
     {{- include "reconciler.labels" . | nindent 4 }}
-  name: edp-{{ .Values.name }}-{{ .Values.global.edpName }}-admin
+  name: edp-{{ .Values.name }}-admin
 roleRef:
   name: admin
   apiGroup: rbac.authorization.k8s.io
