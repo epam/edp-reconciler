@@ -12,7 +12,7 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 image:
-  name: reconciler
+  name: epamedp/reconciler
   # if not defined then .Chart.AppVersion is used
   version:
 imagePullPolicy: "IfNotPresent"
