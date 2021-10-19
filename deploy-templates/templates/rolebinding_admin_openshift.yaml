@@ -7,8 +7,6 @@ metadata:
     {{- include "reconciler.labels" . | nindent 4 }}
   name: edp-{{ .Values.name }}-admin
 roleRef:
-  apiGroup: authorization.openshift.io/v1
-  kind: ClusterRole
   name: admin
 subjects:
   - kind: ServiceAccount
