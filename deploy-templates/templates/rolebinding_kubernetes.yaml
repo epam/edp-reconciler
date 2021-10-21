@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.global.edpName }}
   labels:
     {{- include "reconciler.labels" . | nindent 4 }}
-  name: {{ .Values.name }}-{{ .Values.global.edpName }}
+  name: edp-{{ .Values.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
