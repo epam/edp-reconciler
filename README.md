@@ -1,20 +1,24 @@
 # Reconciler Operator
 
+| :heavy_exclamation_mark: Please refer to [EDP documentation](https://epam.github.io/edp-install/) to get the notion of the main concepts and guidelines. |
+| --- |
+
 Get acquainted with the Reconciler Operator and the installation process as well as the local development.
 
 ## Overview
 
-Reconciler Operator is an EDP operator that is responsible for saving state of CR's in EDP database. 
-Operator installation can be applied on two container orchestration platforms: OpenShift and Kubernetes.
-                                                                                                     
+Reconciler Operator is an EDP operator that is responsible for saving state of CR's in EDP database. Operator installation can be applied on two container orchestration platforms: OpenShift and Kubernetes.
+
 _**NOTE:** Operator is platform-independent, that is why there is a unified instruction for deploying._
 
 ## Prerequisites
+
 * Linux machine or Windows Subsystem for Linux instance with [Helm 3](https://helm.sh/docs/intro/install/) installed;
 * Cluster admin access to the cluster;
-* EDP project/namespace is deployed by following one of the instructions: [EDP Installation on OpenShift](https://github.com/epam/edp-install/blob/master/documentation/openshift_install_edp.md#edp-installation-on-openshift) or [EDP Installation on Kubernetes](https://github.com/epam/edp-install/blob/master/documentation/kubernetes_install_edp.md#edp-installation-on-kubernetes).
+* EDP project/namespace is deployed by following the [Install EDP](https://epam.github.io/edp-install/operator-guide/install-edp/) instruction.
 
 ## Installation
+
 In order to install the EDP Reconciler Operator, follow the steps below:
 
 1. To add the Helm EPAMEDP Charts for local client, run "helm repo add":
@@ -25,14 +29,14 @@ In order to install the EDP Reconciler Operator, follow the steps below:
      ```bash
      helm search repo epamedp/reconciler
      ```
-   Example response:   
+   Example response:
      ```bash
      NAME                    CHART VERSION   APP VERSION     DESCRIPTION
      epamedp/reconciler      v2.4.0                          Helm chart for Golang application/service deplo...
      ```
 
     _**NOTE:** It is highly recommended to use the latest released version._
-    
+
 3. Deploy operator:
 
     Full available chart parameters list:
@@ -47,12 +51,17 @@ In order to install the EDP Reconciler Operator, follow the steps below:
         - image.name                                    # EDP reconciler Docker image name. The released image can be found on [Dockerhub](https://hub.docker.com/r/epamedp/reconciler);
         - image.version                                 # EDP reconciler Docker image tag. The released image can be found on [Dockerhub](https://hub.docker.com/r/epamedp/reconciler/tags);
     ```
-    
+
 4. Install operator in the <edp_cicd_project> namespace with the helm command; find below the installation command example:
     ```bash
-    helm install reconciler epamedp/reconciler --namespace <edp_cicd_project> --version <chart_version> --set name=reconciler --set global.edpName=<edp_cicd_project> --set global.platform=<platform_type> --set global.database.name=<db-name> --set global.database.host=<db-name>.<namespace_name> --set global.database.port=<port> 
+    helm install reconciler epamedp/reconciler --namespace <edp_cicd_project> --version <chart_version> --set name=reconciler --set global.edpName=<edp_cicd_project> --set global.platform=<platform_type> --set global.database.name=<db-name> --set global.database.host=<db-name>.<namespace_name> --set global.database.port=<port>
     ```
-5. Check the <edp_cicd_project> namespace that should contain operator deployment with your operator in a running status
+5. Check the <edp_cicd_project> namespace that should contain operator deployment with your operator in a running status.
 
 ## Local Development
+
 In order to develop the operator, first set up a local environment. For details, please refer to the [Local Development](documentation/local-development.md) page.
+
+### Related Articles
+
+* [Install EDP](https://epam.github.io/edp-install/operator-guide/install-edp/)
