@@ -258,8 +258,6 @@ github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.m
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210719102353-5b2c321433a2/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
-github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210723121127-8ebba1c38950 h1:EUDAmBZIKGUQbN1HOhbcnsKy5ZQVKi5Tei3JbQn5VYc=
-github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210723121127-8ebba1c38950/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210726142624-e26cea43163f h1:flOnL7xfuhmz5d1fE7OWUXfX1HxGuASBynI/geS5YVU=
 github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210726142624-e26cea43163f/go.mod h1:Pf+GV1xiGM3o3HY2kxhRvKQJaS3WZ+l1b/FbwAzeyV8=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719094151-e8e2f2e673ee/go.mod h1:RrlWmvSGjklimKquYTmaZ5RZbqTp77Y6aRzMKrH1oLU=
@@ -267,6 +265,8 @@ github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719101613-f5c6cff5e79e
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719112602-046af47ad1c0/go.mod h1:6lrvH9ratDh1CxYZRQu5XoESAPAZXvhNO3gTkNv9ihA=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719114732-5f764bacb870 h1:bzfQzJcgaGpjkmRrljnCnK9zq2+5YYhKAeRTwcemP0g=
 github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719114732-5f764bacb870/go.mod h1:WSZvUnXDJ4xMVi7Itw9Vfq9EkDt4Ns4FUO3v3u7nOg4=
+github.com/epam/edp-common v0.0.0-20211124100535-e54dcdf42879 h1:Oxv6CLaDZ7/0Pkjt7I1xWmNy7W3T8ROBvRK1b9Y0JmU=
+github.com/epam/edp-common v0.0.0-20211124100535-e54dcdf42879/go.mod h1:S1yrJ76vy4JMkBpartv4qpDDAtPP43aM2sg5YhkB90I=
 github.com/epam/edp-component-operator v0.1.1-0.20210712133513-acb35d96931c/go.mod h1:fxiH4grhavez0q1vBcDleIcQ5mXiIrtSK34TRtgQ4Ec=
 github.com/epam/edp-component-operator v0.1.1-0.20210712140516-09b8bb3a4cff h1:+jj6bPiWhAoq8YIRBY1QM16L4jkefEzX7qY3KrxtZo4=
 github.com/epam/edp-component-operator v0.1.1-0.20210712140516-09b8bb3a4cff/go.mod h1:fxiH4grhavez0q1vBcDleIcQ5mXiIrtSK34TRtgQ4Ec=
@@ -868,8 +868,9 @@ github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXf
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
-github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
+github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/tidwall/pretty v0.0.0-20180105212114-65a9db5fad51/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
