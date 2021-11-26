@@ -5,7 +5,7 @@ ENV OPERATOR=/usr/local/bin/reconciler \
     USER_NAME=reconciler
 
 # install operator binary
-COPY go-binary ${OPERATOR}
+COPY ./dist/go-binary ${OPERATOR}
 
 COPY build/bin /usr/local/bin
 
