@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/epam/edp-reconciler/branch/master/graph/badge.svg?token=NISU3J07BI)](https://codecov.io/gh/epam/edp-reconciler)
+
 # Reconciler Operator
 
 | :heavy_exclamation_mark: Please refer to [EDP documentation](https://epam.github.io/edp-install/) to get the notion of the main concepts and guidelines. |
