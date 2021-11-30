@@ -34,7 +34,7 @@ const (
 	projectPushedStatus  = "pushed"
 )
 
-func GetCodebaseId(txn sql.Tx, name string, schemaName string) (*int, error) {
+func GetCodebaseId(txn *sql.Tx, name string, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectCodebase, schemaName))
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func GetCodebaseId(txn sql.Tx, name string, schemaName string) (*int, error) {
 	return &id, nil
 }
 
-func CreateCodebase(txn sql.Tx, c codebase.Codebase, schemaName string) (*int, error) {
+func CreateCodebase(txn *sql.Tx, c codebase.Codebase, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertCodebase, schemaName))
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func getPerfIdOrNil(perf *codebase.Perf) interface{} {
 	}
 	return getIntOrNil(perf.Id)
 }
-func GetCodebaseTypeById(txn sql.Tx, cbId int, schemaName string) (*string, error) {
+func GetCodebaseTypeById(txn *sql.Tx, cbId int, schemaName string) (*string, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectCodebaseType, schemaName))
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func GetCodebaseTypeById(txn sql.Tx, cbId int, schemaName string) (*string, erro
 	return &cbType, nil
 }
 
-func UpdateStatusByCodebaseId(txn sql.Tx, cbId int, status string, schemaName string) error {
+func UpdateStatusByCodebaseId(txn *sql.Tx, cbId int, status string, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(updateCodebaseStatus, schemaName))
 	if err != nil {
 		return err
@@ -129,7 +129,7 @@ func UpdateStatusByCodebaseId(txn sql.Tx, cbId int, status string, schemaName st
 	return err
 }
 
-func GetApplicationId(txn sql.Tx, name string, schemaName string) (*int, error) {
+func GetApplicationId(txn *sql.Tx, name string, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectApplication, schemaName))
 	if err != nil {
 		return nil, err
@@ -148,14 +148,14 @@ func GetApplicationId(txn sql.Tx, name string, schemaName string) (*int, error) 
 	return &id, nil
 }
 
-func Delete(txn sql.Tx, name, schema string) error {
+func Delete(txn *sql.Tx, name, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebase, schema), name); err != nil {
 		return err
 	}
 	return nil
 }
 
-func Update(txn sql.Tx, c codebase.Codebase, schema string) error {
+func Update(txn *sql.Tx, c codebase.Codebase, schema string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(updateCodebase, schema))
 	if err != nil {
 		return err

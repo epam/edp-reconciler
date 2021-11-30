@@ -8,7 +8,7 @@ const (
 	CheckSchema = "select exists(select 1 from pg_namespace where nspname = $1);"
 )
 
-func DoesSchemaExist(txn sql.Tx, schema string) (bool, error) {
+func DoesSchemaExist(txn *sql.Tx, schema string) (bool, error) {
 	var exists bool
 	err := txn.QueryRow(CheckSchema, schema).Scan(&exists)
 	if err != nil {

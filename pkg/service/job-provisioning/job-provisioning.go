@@ -24,7 +24,7 @@ func (s JobProvisionService) PutJobProvisions(provisions []jenkinsV2Api.JobProvi
 	}
 
 	for _, p := range provisions {
-		id, err := jp.SelectJobProvision(*txn, p.Name, p.Scope, schemaName)
+		id, err := jp.SelectJobProvision(txn, p.Name, p.Scope, schemaName)
 		if err != nil {
 			_ = txn.Rollback()
 			return errors.Wrapf(err, "an error has occurred while selecting job provision %v", p.Name)
@@ -35,7 +35,7 @@ func (s JobProvisionService) PutJobProvisions(provisions []jenkinsV2Api.JobProvi
 			continue
 		}
 
-		err = jp.CreateJobProvision(*txn, p.Name, p.Scope, schemaName)
+		err = jp.CreateJobProvision(txn, p.Name, p.Scope, schemaName)
 		if err != nil {
 			_ = txn.Rollback()
 			return errors.Wrapf(err, "an error has occurred while creating job provision %v", p.Name)

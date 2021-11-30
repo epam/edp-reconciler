@@ -24,7 +24,7 @@ func (s EDPComponentService) PutEDPComponent(component model.EDPComponent, schem
 		return err
 	}
 
-	id, err := ec.SelectEDPComponent(*t, component.Type, schemaName)
+	id, err := ec.SelectEDPComponent(t, component.Type, schemaName)
 	if err != nil {
 		_ = t.Rollback()
 		return errors.Wrap(err, "rollback while executing SelectEDPComponent method")
@@ -38,7 +38,7 @@ func (s EDPComponentService) PutEDPComponent(component model.EDPComponent, schem
 
 	tryToModifyUrl(&component)
 
-	err = ec.CreateEDPComponent(*t, component, schemaName)
+	err = ec.CreateEDPComponent(t, component, schemaName)
 	if err != nil {
 		_ = t.Rollback()
 		return errors.Wrapf(err, "an error has occurred while creating edp component with type %v", component.Type)

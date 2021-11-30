@@ -10,7 +10,7 @@ const (
 	DeleteApplicationsToPromote = "delete from \"%v\".applications_to_promote where cd_pipeline_id = $1 ;"
 )
 
-func CreateApplicationsToPromote(txn sql.Tx, cdPipelineId int, codebaseId int, schemaName string) error {
+func CreateApplicationsToPromote(txn *sql.Tx, cdPipelineId int, codebaseId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertApplicationsToPromote, schemaName))
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func CreateApplicationsToPromote(txn sql.Tx, cdPipelineId int, codebaseId int, s
 	return nil
 }
 
-func RemoveApplicationsToPromote(txn sql.Tx, cdPipelineId int, schemaName string) error {
+func RemoveApplicationsToPromote(txn *sql.Tx, cdPipelineId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(DeleteApplicationsToPromote, schemaName))
 	if err != nil {
 		return err

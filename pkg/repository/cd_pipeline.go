@@ -16,7 +16,7 @@ const (
 	deleteCDPipeline             = "delete from \"%v\".cd_pipeline where name = $1 ;"
 )
 
-func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status, schema string) (*model.CDPipelineDTO, error) {
+func CreateCDPipeline(txn *sql.Tx, cdPipeline cdpipeline.CDPipeline, status, schema string) (*model.CDPipelineDTO, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipeline, schema))
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func CreateCDPipeline(txn sql.Tx, cdPipeline cdpipeline.CDPipeline, status, sche
 	return &cdPipelineDto, nil
 }
 
-func GetCDPipeline(txn sql.Tx, cdPipelineName string, schemaName string) (*model.CDPipelineDTO, error) {
+func GetCDPipeline(txn *sql.Tx, cdPipelineName string, schemaName string) (*model.CDPipelineDTO, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectCDPipeline, schemaName))
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func GetCDPipeline(txn sql.Tx, cdPipelineName string, schemaName string) (*model
 	return &cdPipeline, nil
 }
 
-func UpdateCDPipelineStatus(txn sql.Tx, pipelineId int, cdPipelineStatus string, schemaName string) error {
+func UpdateCDPipelineStatus(txn *sql.Tx, pipelineId int, cdPipelineStatus string, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(updateCDPipelineStatusQuery, schemaName))
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func UpdateCDPipelineStatus(txn sql.Tx, pipelineId int, cdPipelineStatus string,
 	return err
 }
 
-func CreateCDPipelineDockerStream(txn sql.Tx, pipelineId int, dockerStreamId int, schemaName string) error {
+func CreateCDPipelineDockerStream(txn *sql.Tx, pipelineId int, dockerStreamId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipelineDockerStream, schemaName))
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func CreateCDPipelineDockerStream(txn sql.Tx, pipelineId int, dockerStreamId int
 	return err
 }
 
-func DeleteCDPipelineDockerStreams(txn sql.Tx, pipelineId int, schemaName string) error {
+func DeleteCDPipelineDockerStreams(txn *sql.Tx, pipelineId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(deleteAllDockerStreams, schemaName))
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func DeleteCDPipelineDockerStreams(txn sql.Tx, pipelineId int, schemaName string
 	return err
 }
 
-func DeleteCDPipeline(txn sql.Tx, pipeName, schema string) error {
+func DeleteCDPipeline(txn *sql.Tx, pipeName, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCDPipeline, schema), pipeName); err != nil {
 		return err
 	}

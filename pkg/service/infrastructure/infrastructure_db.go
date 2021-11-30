@@ -23,7 +23,7 @@ func (s InfrastructureDbService) DoesSchemaExist(schema string) (bool, error) {
 		return false, err
 	}
 
-	isSchemaExist, err := repository.DoesSchemaExist(*txn, schema)
+	isSchemaExist, err := repository.DoesSchemaExist(txn, schema)
 	if err != nil {
 		return false, errors.Wrap(err, fmt.Sprintf("an error has occurred while checking existing of %v schema", schema))
 	}

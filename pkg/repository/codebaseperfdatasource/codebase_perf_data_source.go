@@ -11,7 +11,7 @@ const (
 	deleteCodebasePerfDataSource = "delete from \"%v\".codebase_perf_data_sources where codebase_id=$1;"
 )
 
-func InsertCodebasePerfDataSource(txn sql.Tx, codebaseId, dsId int, tenant string) error {
+func InsertCodebasePerfDataSource(txn *sql.Tx, codebaseId, dsId int, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertPerfDataSource, tenant))
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func InsertCodebasePerfDataSource(txn sql.Tx, codebaseId, dsId int, tenant strin
 	return err
 }
 
-func CodebasePerfDataSourceExists(txn sql.Tx, codebaseId, dsId int, tenant string) (bool, error) {
+func CodebasePerfDataSourceExists(txn *sql.Tx, codebaseId, dsId int, tenant string) (bool, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(codebasePerfDataSourceExists, tenant))
 	if err != nil {
 		return false, err
@@ -39,7 +39,7 @@ func CodebasePerfDataSourceExists(txn sql.Tx, codebaseId, dsId int, tenant strin
 	return exists, err
 }
 
-func DeleteCodebasePerfDataSourceRecord(txn sql.Tx, codebaseId int, schema string) error {
+func DeleteCodebasePerfDataSourceRecord(txn *sql.Tx, codebaseId int, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebasePerfDataSource, schema), codebaseId); err != nil {
 		return err
 	}

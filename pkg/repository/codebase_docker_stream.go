@@ -41,7 +41,7 @@ const (
 	SelectCodebaseDockerStreamBranchId = "select cds.codebase_branch_id from \"%v\".codebase_docker_stream cds where cds.id = $1;"
 )
 
-func CreateCodebaseDockerStream(txn sql.Tx, schemaName string, branchId *int, ocImageStreamName string) (id *int, err error) {
+func CreateCodebaseDockerStream(txn *sql.Tx, schemaName string, branchId *int, ocImageStreamName string) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(CreateCodebaseDockerStreamQuery, schemaName))
 	if err != nil {
 		return
@@ -52,7 +52,7 @@ func CreateCodebaseDockerStream(txn sql.Tx, schemaName string, branchId *int, oc
 	return
 }
 
-func GetDockerStreamsByPipelineName(txn sql.Tx, schemaName string, cdPipelineName string) ([]model.CodebaseDockerStreamReadDTO, error) {
+func GetDockerStreamsByPipelineName(txn *sql.Tx, schemaName string, cdPipelineName string) ([]model.CodebaseDockerStreamReadDTO, error) {
 	query := fmt.Sprintf(GetDockerStreamsByPipelineNameQuery, schemaName)
 	stmt, err := txn.Prepare(query)
 	if err != nil {
@@ -68,7 +68,7 @@ func GetDockerStreamsByPipelineName(txn sql.Tx, schemaName string, cdPipelineNam
 	return getDockerStreamsFromRows(rows)
 }
 
-func GetDockerStreamsByPipelineNameAndStageOrder(txn sql.Tx, schemaName string, cdPipelineName string, order int) ([]model.CodebaseDockerStreamReadDTO, error) {
+func GetDockerStreamsByPipelineNameAndStageOrder(txn *sql.Tx, schemaName string, cdPipelineName string, order int) ([]model.CodebaseDockerStreamReadDTO, error) {
 	query := fmt.Sprintf(GetDockerStreamsByPipelineNameAndStageOrderQuery, schemaName)
 	stmt, err := txn.Prepare(query)
 	if err != nil {
@@ -84,7 +84,7 @@ func GetDockerStreamsByPipelineNameAndStageOrder(txn sql.Tx, schemaName string, 
 	return getDockerStreamsFromRows(rows)
 }
 
-func CreateStageCodebaseDockerStream(txn sql.Tx, schemaName string, stageId int, inputStreamId int, outputStreamId int) error {
+func CreateStageCodebaseDockerStream(txn *sql.Tx, schemaName string, stageId int, inputStreamId int, outputStreamId int) error {
 	query := fmt.Sprintf(CreateStageCodebaseDockerStreamQuery, schemaName)
 	stmt, err := txn.Prepare(query)
 	if err != nil {
@@ -115,7 +115,7 @@ func getDockerStreamsFromRows(rows *sql.Rows) ([]model.CodebaseDockerStreamReadD
 	return result, err
 }
 
-func DeleteStageCodebaseDockerStream(txn sql.Tx, stageId int, schemaName string) ([]int, error) {
+func DeleteStageCodebaseDockerStream(txn *sql.Tx, stageId int, schemaName string) ([]int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(RemoveStageCodebaseDockerStream, schemaName))
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func getOutputStreamIds(rows *sql.Rows) ([]int, error) {
 	return result, err
 }
 
-func GetSourceInputStream(txn sql.Tx, cdPipelineName, codebaseName, schemaName string) (*int, error) {
+func GetSourceInputStream(txn *sql.Tx, cdPipelineName, codebaseName, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectSourceInputStream, schemaName))
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func GetSourceInputStream(txn sql.Tx, cdPipelineName, codebaseName, schemaName s
 	return &id, nil
 }
 
-func GetCodebaseDockerStreamId(txn sql.Tx, dockerStream, schemaName string) (*int, error) {
+func GetCodebaseDockerStreamId(txn *sql.Tx, dockerStream, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectCodebaseDockerStreamId, schemaName))
 	if err != nil {
 		return nil, err
@@ -184,7 +184,7 @@ func GetCodebaseDockerStreamId(txn sql.Tx, dockerStream, schemaName string) (*in
 	return &id, nil
 }
 
-func UpdateBranchIdCodebaseDockerStream(txn sql.Tx, dockerStreamId int, branchId int, schemaName string) error {
+func UpdateBranchIdCodebaseDockerStream(txn *sql.Tx, dockerStreamId int, branchId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(UpdateCodebaseDockerStreamBranchId, schemaName))
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func UpdateBranchIdCodebaseDockerStream(txn sql.Tx, dockerStreamId int, branchId
 	return err
 }
 
-func GetCodebaseDockerStreamBranchId(txn sql.Tx, dockerStreamId int, schemaName string) (*int, error) {
+func GetCodebaseDockerStreamBranchId(txn *sql.Tx, dockerStreamId int, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectCodebaseDockerStreamBranchId, schemaName))
 	if err != nil {
 		return nil, err

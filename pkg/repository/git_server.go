@@ -11,7 +11,7 @@ const (
 	SelectGitServerSql = "select id from \"%v\".git_server where name = $1;"
 )
 
-func CreateGitServer(txn sql.Tx, name string, hostname string, available bool, tenant string) (*int, error) {
+func CreateGitServer(txn *sql.Tx, name string, hostname string, available bool, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertGitServerSql, tenant))
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func CreateGitServer(txn sql.Tx, name string, hostname string, available bool, t
 	return &id, err
 }
 
-func UpdateGitServer(txn sql.Tx, id *int, available bool, tenant string) error {
+func UpdateGitServer(txn *sql.Tx, id *int, available bool, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(UpdateGitServerSql, tenant))
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func UpdateGitServer(txn sql.Tx, id *int, available bool, tenant string) error {
 	return err
 }
 
-func SelectGitServer(txn sql.Tx, name, tenant string) (*int, error) {
+func SelectGitServer(txn *sql.Tx, name, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectGitServerSql, tenant))
 	if err != nil {
 		return nil, err

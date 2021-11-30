@@ -10,7 +10,7 @@ const (
 	InsertJenkinsSlaveSql = "insert into \"%v\".jenkins_slave(name) values ($1)"
 )
 
-func SelectJenkinsSlave(txn sql.Tx, name, tenant string) (*int, error) {
+func SelectJenkinsSlave(txn *sql.Tx, name, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectJenkinsSlaveSql, tenant))
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func SelectJenkinsSlave(txn sql.Tx, name, tenant string) (*int, error) {
 	return &id, err
 }
 
-func CreateJenkinsSlave(txn sql.Tx, name string, tenant string) error {
+func CreateJenkinsSlave(txn *sql.Tx, name string, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertJenkinsSlaveSql, tenant))
 	if err != nil {
 		return err

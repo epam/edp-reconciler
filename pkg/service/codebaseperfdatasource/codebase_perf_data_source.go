@@ -27,7 +27,7 @@ func (s CodebasePerfDataSourceService) InsertCodebasePerfDataSources(codebaseId 
 	}
 
 	for _, ds := range perf.DataSources {
-		id, err := perfdatasource.GetDataSourceId(*txn, strings.ToUpper(ds), tenant)
+		id, err := perfdatasource.GetDataSourceId(txn, strings.ToUpper(ds), tenant)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func (s CodebasePerfDataSourceService) InsertCodebasePerfDataSources(codebaseId 
 			continue
 		}
 
-		if err := codebaseperfdatasource.InsertCodebasePerfDataSource(*txn, codebaseId, *id, tenant); err != nil {
+		if err := codebaseperfdatasource.InsertCodebasePerfDataSource(txn, codebaseId, *id, tenant); err != nil {
 			_ = txn.Rollback()
 			return err
 		}
@@ -63,7 +63,7 @@ func (s CodebasePerfDataSourceService) codebasePerfDataSourceExists(codebaseId, 
 		return false, err
 	}
 
-	exists, err := codebaseperfdatasource.CodebasePerfDataSourceExists(*txn, codebaseId, dsId, tenant)
+	exists, err := codebaseperfdatasource.CodebasePerfDataSourceExists(txn, codebaseId, dsId, tenant)
 	if err != nil {
 		return false, err
 	}

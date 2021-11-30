@@ -14,7 +14,7 @@ const (
 		"values($1, $2);"
 )
 
-func CreateCodebaseAction(txn sql.Tx, codebaseId int, codebaseActionId int, schemaName string) error {
+func CreateCodebaseAction(txn *sql.Tx, codebaseId int, codebaseActionId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertCodebaseActionLog, schemaName))
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func CreateCodebaseAction(txn sql.Tx, codebaseId int, codebaseActionId int, sche
 	return nil
 }
 
-func CreateActionLog(txn sql.Tx, actionLog model.ActionLog, schemaName string) (*int, error) {
+func CreateActionLog(txn *sql.Tx, actionLog model.ActionLog, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertActionLog, schemaName))
 	if err != nil {
 		return nil, err

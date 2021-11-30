@@ -11,7 +11,7 @@ const (
 	SelectEDPComponentSql = "select id from \"%v\".edp_component where type = $1;"
 )
 
-func CreateEDPComponent(txn sql.Tx, component model.EDPComponent, tenant string) error {
+func CreateEDPComponent(txn *sql.Tx, component model.EDPComponent, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertEDPComponentSql, tenant))
 	if err != nil {
 		return err
@@ -23,7 +23,7 @@ func CreateEDPComponent(txn sql.Tx, component model.EDPComponent, tenant string)
 	return err
 }
 
-func SelectEDPComponent(txn sql.Tx, componentType, tenant string) (*int, error) {
+func SelectEDPComponent(txn *sql.Tx, componentType, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectEDPComponentSql, tenant))
 	if err != nil {
 		return nil, err

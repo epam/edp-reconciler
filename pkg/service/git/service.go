@@ -25,7 +25,7 @@ func (s GitServerService) PutGitServer(gitServer gitserver.GitServer) error {
 		return err
 	}
 
-	id, err := repository.SelectGitServer(*txn, gitServer.Name, gitServer.Tenant)
+	id, err := repository.SelectGitServer(txn, gitServer.Name, gitServer.Tenant)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrap(err, fmt.Sprintf("an error has occurred while fetching Git Server Record %v", gitServer.Name))
@@ -34,7 +34,7 @@ func (s GitServerService) PutGitServer(gitServer gitserver.GitServer) error {
 	if id != nil {
 		log.Info("Start updating Git Server", "record", gitServer.Name)
 
-		err = repository.UpdateGitServer(*txn, id, gitServer.ActionLog.Result == "success", gitServer.Tenant)
+		err = repository.UpdateGitServer(txn, id, gitServer.ActionLog.Result == "success", gitServer.Tenant)
 		if err != nil {
 			_ = txn.Rollback()
 			return errors.Wrap(err, fmt.Sprintf("an error has occurred while updating Git Server Record %v", gitServer.Name))
@@ -42,7 +42,7 @@ func (s GitServerService) PutGitServer(gitServer gitserver.GitServer) error {
 	} else {
 		log.Info("Start creating Git Server", "record", gitServer.Name)
 
-		_, err = repository.CreateGitServer(*txn, gitServer.Name, gitServer.GitHost, gitServer.ActionLog.Result == "success", gitServer.Tenant)
+		_, err = repository.CreateGitServer(txn, gitServer.Name, gitServer.GitHost, gitServer.ActionLog.Result == "success", gitServer.Tenant)
 		if err != nil {
 			_ = txn.Rollback()
 			return errors.Wrap(err, fmt.Sprintf("an error has occurred while creating Git Server Record %v", gitServer.GitHost))

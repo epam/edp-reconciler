@@ -11,7 +11,7 @@ const (
 	insertPerfServer = "insert into \"%v\".perf_server(name, available) values ($1, $2) returning id;"
 )
 
-func SelectPerfServer(txn sql.Tx, name, tenant string) (*int, error) {
+func SelectPerfServer(txn *sql.Tx, name, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectPerfServer, tenant))
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func SelectPerfServer(txn sql.Tx, name, tenant string) (*int, error) {
 	return &id, err
 }
 
-func UpdatePerfServer(txn sql.Tx, id *int, available bool, tenant string) error {
+func UpdatePerfServer(txn *sql.Tx, id *int, available bool, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(updatePerfServer, tenant))
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func UpdatePerfServer(txn sql.Tx, id *int, available bool, tenant string) error 
 	return err
 }
 
-func CreatePerfServer(txn sql.Tx, name string, available bool, tenant string) error {
+func CreatePerfServer(txn *sql.Tx, name string, available bool, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertPerfServer, tenant))
 	if err != nil {
 		return err

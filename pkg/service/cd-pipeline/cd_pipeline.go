@@ -56,13 +56,13 @@ func (s CdPipelineService) PutCDPipeline(cdPipeline cdpipeline.CDPipeline) error
 
 func (s CdPipelineService) getCDPipelineOrCreate(txn *sql.Tx, cdPipeline cdpipeline.CDPipeline, schemaName string) (*model.CDPipelineDTO, error) {
 	log.V(2).Info("start retrieving CD Pipeline", "name", cdPipeline.Name)
-	cdPipelineReadModel, err := repository.GetCDPipeline(*txn, cdPipeline.Name, schemaName)
+	cdPipelineReadModel, err := repository.GetCDPipeline(txn, cdPipeline.Name, schemaName)
 	if err != nil {
 		return nil, err
 	}
 
 	if cdPipelineReadModel != nil {
-		if err := repository.DeleteCDPipelineDockerStreams(*txn, cdPipelineReadModel.Id, schemaName); err != nil {
+		if err := repository.DeleteCDPipelineDockerStreams(txn, cdPipelineReadModel.Id, schemaName); err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while deleting pipeline's docker streams")
 		}
 
@@ -114,7 +114,7 @@ func (s CdPipelineService) getCDPipelineOrCreate(txn *sql.Tx, cdPipeline cdpipel
 }
 
 func updateApplicationsToPromote(tx *sql.Tx, cdPipelineId int, applicationsToPromote []string, schemaName string) error {
-	if err := repository.RemoveApplicationsToPromote(*tx, cdPipelineId, schemaName); err != nil {
+	if err := repository.RemoveApplicationsToPromote(tx, cdPipelineId, schemaName); err != nil {
 		return errors.Wrapf(err, "an error has occurred while removing Application To Promote records for Stage %v", cdPipelineId)
 	}
 	if err := createApplicationToPromoteRow(tx, cdPipelineId, applicationsToPromote, schemaName); err != nil {
@@ -126,12 +126,12 @@ func updateApplicationsToPromote(tx *sql.Tx, cdPipelineId int, applicationsToPro
 func createApplicationToPromoteRow(txn *sql.Tx, cdPipelineId int, applicationsToPromote []string, schemaName string) error {
 	log.V(2).Info("try to create record in ApplicationToPromote table", "applicationsToPromote", applicationsToPromote)
 	for _, appToPromote := range applicationsToPromote {
-		id, err := repository.GetApplicationId(*txn, appToPromote, schemaName)
+		id, err := repository.GetApplicationId(txn, appToPromote, schemaName)
 		if err != nil {
 			return err
 		}
 
-		if err := repository.CreateApplicationsToPromote(*txn, cdPipelineId, *id, schemaName); err != nil {
+		if err := repository.CreateApplicationsToPromote(txn, cdPipelineId, *id, schemaName); err != nil {
 			return err
 		}
 	}
@@ -159,7 +159,7 @@ func (s CdPipelineService) updateStageCodebaseDockerStreamRelations(txn *sql.Tx,
 }
 
 func getStages(txn *sql.Tx, cdPipelineName string, schemaName string) ([]stage.Stage, error) {
-	stages, err := sr.GetStages(*txn, cdPipelineName, schemaName)
+	stages, err := sr.GetStages(txn, cdPipelineName, schemaName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has occurred while getting Stages for CD Pipeline %v", cdPipelineName)
 	}
@@ -172,7 +172,7 @@ func deleteStageCodebaseDockerStream(txn *sql.Tx, stages []stage.Stage, schemaNa
 	var stagesToLog []string
 
 	for _, stage := range stages {
-		outputStreamIds, err := repository.DeleteStageCodebaseDockerStream(*txn, stage.Id, schemaName)
+		outputStreamIds, err := repository.DeleteStageCodebaseDockerStream(txn, stage.Id, schemaName)
 		outputStreamIdsToRemove = append(outputStreamIdsToRemove, outputStreamIds...)
 		if err != nil {
 			return nil, errors.Wrap(err, "an error has occurred while deleting stage codebase docker stream row")
@@ -203,7 +203,7 @@ func (s CdPipelineService) updateStageCodebaseDockerStream(txn *sql.Tx, stages [
 
 func createCDPipeline(txn *sql.Tx, cdPipeline cdpipeline.CDPipeline, schemaName string) (*model.CDPipelineDTO, error) {
 	log.V(2).Info("start insertion cd_pipeline to table", "name", cdPipeline.Name)
-	cdPipelineDto, err := repository.CreateCDPipeline(*txn, cdPipeline, cdPipeline.Status, schemaName)
+	cdPipelineDto, err := repository.CreateCDPipeline(txn, cdPipeline, cdPipeline.Status, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -213,13 +213,13 @@ func createCDPipeline(txn *sql.Tx, cdPipeline cdpipeline.CDPipeline, schemaName 
 
 func updateActionLog(txn *sql.Tx, cdPipeline cdpipeline.CDPipeline, pipelineId int, schemaName string) error {
 	log.V(2).Info("start updating status of CD Pipeline", "name", cdPipeline.Name)
-	actionLogId, err := repository.CreateEventActionLog(*txn, cdPipeline.ActionLog, schemaName)
+	actionLogId, err := repository.CreateEventActionLog(txn, cdPipeline.ActionLog, schemaName)
 	if err != nil {
 		return errors.Wrapf(err, "cannot insert status %v", cdPipeline)
 	}
 
 	log.V(2).Info("start updating cd_pipeline_codebase_action status of code pipeline entity...")
-	if err := repository.CreateCDPipelineActionLog(*txn, pipelineId, *actionLogId, schemaName); err != nil {
+	if err := repository.CreateCDPipelineActionLog(txn, pipelineId, *actionLogId, schemaName); err != nil {
 		return errors.Wrapf(err, "cannot create cd_pipeline_action entity %v", cdPipeline)
 	}
 	log.Info("cd_pipeline_action has been updated")
@@ -230,7 +230,7 @@ func updateCDPipelineStatus(txn *sql.Tx, cdPipelineDb model.CDPipelineDTO, statu
 	if cdPipelineDb.Status != status {
 		log.V(2).Info("start updating status of cd pipeline",
 			"pipe name", cdPipelineDb.Name, "status", status)
-		if err := repository.UpdateCDPipelineStatus(*txn, cdPipelineDb.Id, status, schemaName); err != nil {
+		if err := repository.UpdateCDPipelineStatus(txn, cdPipelineDb.Id, status, schemaName); err != nil {
 			return err
 		}
 	}
@@ -240,7 +240,7 @@ func updateCDPipelineStatus(txn *sql.Tx, cdPipelineDb model.CDPipelineDTO, statu
 func createCDPipelineDockerStream(txn *sql.Tx, cdPipelineId int, dockerStreams []string, schemaName string) error {
 	var dockerStreamIds []int
 	for _, dockerStream := range dockerStreams {
-		id, err := repository.GetCodebaseDockerStreamId(*txn, dockerStream, schemaName)
+		id, err := repository.GetCodebaseDockerStreamId(txn, dockerStream, schemaName)
 		if err != nil {
 			return errors.Wrapf(err, "an error has occurred while getting id of docker stream %v", dockerStream)
 		}
@@ -259,7 +259,7 @@ func createCDPipelineDockerStream(txn *sql.Tx, cdPipelineId int, dockerStreams [
 
 func insertCDPipelineDockerStream(txn *sql.Tx, cdPipelineId int, dockerStreams []int, schemaName string) error {
 	for _, id := range dockerStreams {
-		if err := repository.CreateCDPipelineDockerStream(*txn, cdPipelineId, id, schemaName); err != nil {
+		if err := repository.CreateCDPipelineDockerStream(txn, cdPipelineId, id, schemaName); err != nil {
 			return errors.Wrapf(err, "an error has occurred while inserting CD Pipeline Docker Stream row %v", id)
 		}
 	}
@@ -273,12 +273,12 @@ func (s CdPipelineService) DeleteCDPipeline(pipeName, schema string) error {
 		return err
 	}
 
-	if err := sr.DeleteCodebaseDockerStreams(*txn, pipeName, schema); err != nil {
+	if err := sr.DeleteCodebaseDockerStreams(txn, pipeName, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete codebase docker streams for %v cd pipeline", pipeName)
 	}
 
-	if err := repository.DeleteCDPipeline(*txn, pipeName, schema); err != nil {
+	if err := repository.DeleteCDPipeline(txn, pipeName, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete cd pipeline %v", pipeName)
 	}

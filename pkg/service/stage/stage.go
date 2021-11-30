@@ -112,12 +112,12 @@ func updateOutputStreamsRelation(tx *sql.Tx, id int, stage stage.Stage, dtos []m
 func createSingleOutputStreamAndLink(tx *sql.Tx, stageId int, stage stage.Stage, dto model.CodebaseDockerStreamReadDTO, applicationsToApprove []string) error {
 	log.V(2).Info("start creating single outputstream and link for stage", "stage id", stageId, "stream id", dto.CodebaseDockerStreamId)
 	ocImageStreamName := fmt.Sprintf("%v-%v-%v-verified", stage.CdPipelineName, stage.Name, dto.CodebaseName)
-	branchId, err := repository.GetCodebaseDockerStreamBranchId(*tx, dto.CodebaseDockerStreamId, stage.Tenant)
+	branchId, err := repository.GetCodebaseDockerStreamBranchId(tx, dto.CodebaseDockerStreamId, stage.Tenant)
 	if err != nil {
 		return errors.Wrapf(err, "cannot get branch id by codebase docker stream id %v", dto.CodebaseDockerStreamId)
 	}
 
-	outputId, err := repository.CreateCodebaseDockerStream(*tx, stage.Tenant, branchId, ocImageStreamName)
+	outputId, err := repository.CreateCodebaseDockerStream(tx, stage.Tenant, branchId, ocImageStreamName)
 	if err != nil {
 		return errors.Wrap(err, "cannot create codebase docker stream")
 	}
@@ -160,7 +160,7 @@ func tryToCreateOutputCodebaseDockerStreamIfDoesNotExist(tx *sql.Tx, stage stage
 
 	var outputId *int
 
-	outputId, err := repository.GetCodebaseDockerStreamId(*tx, ocImageStreamName, stage.Tenant)
+	outputId, err := repository.GetCodebaseDockerStreamId(tx, ocImageStreamName, stage.Tenant)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get Codebase Docker Stream Id %v: %v", ocImageStreamName, err)
 	}
@@ -168,12 +168,12 @@ func tryToCreateOutputCodebaseDockerStreamIfDoesNotExist(tx *sql.Tx, stage stage
 	if outputId == nil {
 		log.V(2).Info("output stream has not been created. Try to create it ...")
 
-		branchId, err := repository.GetCodebaseDockerStreamBranchId(*tx, dto.CodebaseDockerStreamId, stage.Tenant)
+		branchId, err := repository.GetCodebaseDockerStreamBranchId(tx, dto.CodebaseDockerStreamId, stage.Tenant)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get branch id by codebase docker stream id %v: %v", dto.CodebaseDockerStreamId, err)
 		}
 
-		outputId, err = repository.CreateCodebaseDockerStream(*tx, stage.Tenant, branchId, ocImageStreamName)
+		outputId, err = repository.CreateCodebaseDockerStream(tx, stage.Tenant, branchId, ocImageStreamName)
 		if err != nil {
 			return nil, fmt.Errorf("cannot create codebase docker stream for dto: %v", dto)
 		}
@@ -185,7 +185,7 @@ func tryToCreateOutputCodebaseDockerStreamIfDoesNotExist(tx *sql.Tx, stage stage
 
 func setPreviousStageInputImageStream(tx *sql.Tx, stage stage.Stage, inputId int, outputId int) error {
 	log.V(2).Info("previous Stage Input Stream", "stage", stage.Id, "input", inputId, "output", outputId)
-	return repository.CreateStageCodebaseDockerStream(*tx, stage.Tenant, stage.Id, inputId, outputId)
+	return repository.CreateStageCodebaseDockerStream(tx, stage.Tenant, stage.Id, inputId, outputId)
 }
 
 func setOriginalInputImageStream(tx *sql.Tx, stage stage.Stage, codebaseName string, outputId int) error {
@@ -194,11 +194,11 @@ func setOriginalInputImageStream(tx *sql.Tx, stage stage.Stage, codebaseName str
 		return err
 	}
 	log.V(2).Info("source Stage Input Stream", "stage", stage.Id, "input", sourceInputStream, "output", outputId)
-	return repository.CreateStageCodebaseDockerStream(*tx, stage.Tenant, stage.Id, *sourceInputStream, outputId)
+	return repository.CreateStageCodebaseDockerStream(tx, stage.Tenant, stage.Id, *sourceInputStream, outputId)
 }
 
 func getOriginalInputImageStream(tx *sql.Tx, cdPipelineName, codebaseName, schemaName string) (*int, error) {
-	originalInputStream, err := repository.GetSourceInputStream(*tx, cdPipelineName, codebaseName, schemaName)
+	originalInputStream, err := repository.GetSourceInputStream(tx, cdPipelineName, codebaseName, schemaName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "couldn't fetch Original Input Stream for pipeline %v", "codebase %v")
 	}
@@ -235,7 +235,7 @@ func getInputDockerStreams(tx *sql.Tx, id int, stage stage.Stage) ([]model.Codeb
 
 func getInputDockerStreamsForArbitraryStage(tx *sql.Tx, id int, stage stage.Stage) ([]model.CodebaseDockerStreamReadDTO, error) {
 	log.V(2).Info("start reading input docker streams for the arbitrary stage with id: %v", id)
-	streams, err := repository.GetDockerStreamsByPipelineNameAndStageOrder(*tx, stage.Tenant, stage.CdPipelineName, stage.Order-1)
+	streams, err := repository.GetDockerStreamsByPipelineNameAndStageOrder(tx, stage.Tenant, stage.CdPipelineName, stage.Order-1)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has been occurred during the read docker streams %v", "stage order %v")
 	}
@@ -245,7 +245,7 @@ func getInputDockerStreamsForArbitraryStage(tx *sql.Tx, id int, stage stage.Stag
 
 func getInputDockerStreamsForFirstStage(tx *sql.Tx, id int, stage stage.Stage) ([]model.CodebaseDockerStreamReadDTO, error) {
 	log.V(2).Info("start reading input docker streams for the first stage", "stage id", id)
-	streams, err := repository.GetDockerStreamsByPipelineName(*tx, stage.Tenant, stage.CdPipelineName)
+	streams, err := repository.GetDockerStreamsByPipelineName(tx, stage.Tenant, stage.CdPipelineName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has been occurred during the read docker streams %v",
 			stage.CdPipelineName)
@@ -264,7 +264,7 @@ func canStageBeCreated(tx *sql.Tx, stage stage.Stage) bool {
 
 func prevStageAdded(tx *sql.Tx, stage stage.Stage) bool {
 	log.V(2).Info("check previous stage fot stage", "name", stage.Name)
-	stageId, err := sr.GetStageIdByPipelineNameAndOrder(*tx, stage.Tenant, stage.CdPipelineName, stage.Order-1)
+	stageId, err := sr.GetStageIdByPipelineNameAndOrder(tx, stage.Tenant, stage.CdPipelineName, stage.Order-1)
 	if err != nil {
 		log.Error(err, "an error has been occurred while retrieving prev stage id : %v", stageId)
 		return false
@@ -279,7 +279,7 @@ func prevStageAdded(tx *sql.Tx, stage stage.Stage) bool {
 
 func updateStageStatus(tx *sql.Tx, id *int, stage stage.Stage) error {
 	log.V(2).Info("start updating status for stage", "id", *id, "status", stage.Status)
-	err := sr.UpdateStageStatus(*tx, stage.Tenant, *id, stage.Status)
+	err := sr.UpdateStageStatus(tx, stage.Tenant, *id, stage.Status)
 	if err != nil {
 		return errors.Wrapf(err, "an error has been occurred while updating stage status: %v", stage.Name)
 	}
@@ -288,7 +288,7 @@ func updateStageStatus(tx *sql.Tx, id *int, stage stage.Stage) error {
 }
 
 func getStageIdOrCreate(tx *sql.Tx, edpRestClient *rest.RESTClient, stage stage.Stage) (*int, error) {
-	id, err := sr.GetStageId(*tx, stage.Tenant, stage.Name, stage.CdPipelineName)
+	id, err := sr.GetStageId(tx, stage.Tenant, stage.Name, stage.CdPipelineName)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func getStageIdOrCreate(tx *sql.Tx, edpRestClient *rest.RESTClient, stage stage.
 
 func createStage(tx *sql.Tx, edpRestClient *rest.RESTClient, stage stage.Stage) (*int, error) {
 	log.V(2).Info("start creating stage in db", "name", stage.Name)
-	cdPipeline, err := repository.GetCDPipeline(*tx, stage.CdPipelineName, stage.Tenant)
+	cdPipeline, err := repository.GetCDPipeline(tx, stage.CdPipelineName, stage.Tenant)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has been occurred while reading cd pipeline %v", stage.CdPipelineName)
 	}
@@ -313,7 +313,7 @@ func createStage(tx *sql.Tx, edpRestClient *rest.RESTClient, stage stage.Stage) 
 		return nil, err
 	}
 
-	id, err := sr.CreateStage(*tx, stage, cdPipeline.Id)
+	id, err := sr.CreateStage(tx, stage, cdPipeline.Id)
 	if err != nil {
 		return nil, errors.Wrap(err, "couldn't create stage id db")
 	}
@@ -339,7 +339,7 @@ func setLibraryIdOrDoNothing(txn *sql.Tx, source *stage.Source, schemaName strin
 		return nil
 	}
 
-	id, err := repository.GetCodebaseId(*txn, source.Library.Name, schemaName)
+	id, err := repository.GetCodebaseId(txn, source.Library.Name, schemaName)
 	if err != nil {
 		return errors.Wrapf(err, "an error has occurred while getting library id by %v codebase name",
 			source.Library.Name)
@@ -349,7 +349,7 @@ func setLibraryIdOrDoNothing(txn *sql.Tx, source *stage.Source, schemaName strin
 	}
 	source.Library.Id = id
 
-	bid, err := codebasebranch.GetCodebaseBranchId(*txn, source.Library.Name, source.Library.Branch, schemaName)
+	bid, err := codebasebranch.GetCodebaseBranchId(txn, source.Library.Name, source.Library.Branch, schemaName)
 	if err != nil {
 		return errors.Wrapf(err, "an error has occurred while getting library branch id by %v codebase name and %v branch",
 			source.Library.Name, source.Library.Branch)
@@ -383,18 +383,18 @@ func insertQualityGateRow(tx *sql.Tx, cdStageId int, gates []stage.QualityGate, 
 }
 
 func insertAutotestQualityGate(tx *sql.Tx, cdStageId int, gate stage.QualityGate, schemaName string) error {
-	entityIdsDTO, err := sr.GetCodebaseAndBranchIds(*tx, *gate.AutotestName, *gate.BranchName, schemaName)
+	entityIdsDTO, err := sr.GetCodebaseAndBranchIds(tx, *gate.AutotestName, *gate.BranchName, schemaName)
 	if err != nil {
 		return err
 	}
 
-	_, err = sr.CreateQualityGate(*tx, gate.QualityGate, gate.JenkinsStepName, cdStageId, &entityIdsDTO.CodebaseId, &entityIdsDTO.BranchId, schemaName)
+	_, err = sr.CreateQualityGate(tx, gate.QualityGate, gate.JenkinsStepName, cdStageId, &entityIdsDTO.CodebaseId, &entityIdsDTO.BranchId, schemaName)
 
 	return err
 }
 
 func insertManualQualityGate(tx *sql.Tx, cdStageId int, gate stage.QualityGate, schemaName string) error {
-	_, err := sr.CreateQualityGate(*tx, gate.QualityGate, gate.JenkinsStepName, cdStageId, nil, nil, schemaName)
+	_, err := sr.CreateQualityGate(tx, gate.QualityGate, gate.JenkinsStepName, cdStageId, nil, nil, schemaName)
 
 	return err
 }
@@ -406,7 +406,7 @@ func (s StageService) DeleteCDStage(pipeName, stageName, schema string) error {
 		return errors.New("error has occurred during opening transaction")
 	}
 
-	id, err := sr.SelectCodebaseDockerStreamId(*txn, pipeName, stageName, schema)
+	id, err := sr.SelectCodebaseDockerStreamId(txn, pipeName, stageName, schema)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't get codebase docker stream id by cd stage %v for cd pipeline", stageName)
@@ -418,12 +418,12 @@ func (s StageService) DeleteCDStage(pipeName, stageName, schema string) error {
 		return nil
 	}
 
-	if err := sr.DeleteCodebaseDockerStream(*txn, *id, schema); err != nil {
+	if err := sr.DeleteCodebaseDockerStream(txn, *id, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete codebase docker stream with %v id", *id)
 	}
 
-	if err := sr.DeleteCDStage(*txn, pipeName, stageName, schema); err != nil {
+	if err := sr.DeleteCDStage(txn, pipeName, stageName, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete cd stage %v for cd pipeline", stageName)
 	}
@@ -438,7 +438,7 @@ func (s StageService) DeleteCDStage(pipeName, stageName, schema string) error {
 func updateStageTriggerType(tx *sql.Tx, id *int, triggerType, tenant string) error {
 	log := log.WithValues("id", *id, "trigger_type", triggerType)
 	log.Info("start updating trigger type for stage")
-	err := sr.UpdateStageTriggerType(*tx, *id, tenant, triggerType)
+	err := sr.UpdateStageTriggerType(tx, *id, tenant, triggerType)
 	if err != nil {
 		return errors.Wrapf(err, "an error has been occurred while updating stage trigger type: %v", id)
 	}

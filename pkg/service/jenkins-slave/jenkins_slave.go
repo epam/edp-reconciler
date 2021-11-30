@@ -27,7 +27,7 @@ func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave
 			continue
 		}
 
-		id, err := jenkins_slave.SelectJenkinsSlave(*txn, s.Name, schemaName)
+		id, err := jenkins_slave.SelectJenkinsSlave(txn, s.Name, schemaName)
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave
 			continue
 		}
 
-		if err := jenkins_slave.CreateJenkinsSlave(*txn, s.Name, schemaName); err != nil {
+		if err := jenkins_slave.CreateJenkinsSlave(txn, s.Name, schemaName); err != nil {
 			return err
 		}
 	}

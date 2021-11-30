@@ -10,7 +10,7 @@ const (
 	InsertJobProvisioningSql = "insert into \"%v\".job_provisioning(name, scope) values ($1, $2)"
 )
 
-func SelectJobProvision(txn sql.Tx, name string, scope string, tenant string) (*int, error) {
+func SelectJobProvision(txn *sql.Tx, name string, scope string, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectJobProvisioningSql, tenant))
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func SelectJobProvision(txn sql.Tx, name string, scope string, tenant string) (*
 	return &id, err
 }
 
-func CreateJobProvision(txn sql.Tx, name string, scope string, tenant string) error {
+func CreateJobProvision(txn *sql.Tx, name string, scope string, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertJobProvisioningSql, tenant))
 	if err != nil {
 		return err

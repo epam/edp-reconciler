@@ -54,10 +54,10 @@ const (
 		"left join \"%[1]v\".cd_pipeline cp on cs.cd_pipeline_id = cp.id " +
 		"where cp.name = $1 );"
 	updateStageTriggerType = "update \"%v\".cd_stage set trigger_type = $1 where id = $2;"
-	scope = "cd"
+	scope                  = "cd"
 )
 
-func CreateStage(txn sql.Tx, stage stage.Stage, cdPipelineId int) (id *int, err error) {
+func CreateStage(txn *sql.Tx, stage stage.Stage, cdPipelineId int) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertStage, stage.Tenant))
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func getLibraryBranchIdOrNil(source stage.Source) *int {
 	return source.Library.BranchId
 }
 
-func GetStageId(txn sql.Tx, schemaName string, name string, cdPipelineName string) (id *int, err error) {
+func GetStageId(txn *sql.Tx, schemaName string, name string, cdPipelineName string) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectStageId, schemaName, schemaName))
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func GetStageId(txn sql.Tx, schemaName string, name string, cdPipelineName strin
 	return id, nil
 }
 
-func UpdateStageStatus(txn sql.Tx, schemaName string, id int, status string) error {
+func UpdateStageStatus(txn *sql.Tx, schemaName string, id int, status string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(UpdateStageStatusQuery, schemaName))
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func UpdateStageStatus(txn sql.Tx, schemaName string, id int, status string) err
 	return err
 }
 
-func GetStageIdByPipelineNameAndOrder(txn sql.Tx, schemaName string, cdPipelineName string, order int) (id *int, err error) {
+func GetStageIdByPipelineNameAndOrder(txn *sql.Tx, schemaName string, cdPipelineName string, order int) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(GetStageIdByPipelineNameAndOrderQuery, schemaName, schemaName))
 
 	if err != nil {
@@ -130,7 +130,7 @@ func checkNoRows(err error) (*int, error) {
 	return nil, err
 }
 
-func GetStages(txn sql.Tx, pipelineName string, schemaName string) ([]stage.Stage, error) {
+func GetStages(txn *sql.Tx, pipelineName string, schemaName string) ([]stage.Stage, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(GetStagesIdByCDPipelineName, schemaName, schemaName))
 
 	if err != nil {
@@ -167,7 +167,7 @@ func getStage(rows *sql.Rows) ([]stage.Stage, error) {
 	return result, err
 }
 
-func CreateQualityGate(txn sql.Tx, qualityGateType string, jenkinsStepName string, cdStageId int, codebaseId *int, codebaseBranchId *int, schemaName string) (id *int, err error) {
+func CreateQualityGate(txn *sql.Tx, qualityGateType string, jenkinsStepName string, cdStageId int, codebaseId *int, codebaseBranchId *int, schemaName string) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertQualityGate, schemaName))
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func CreateQualityGate(txn sql.Tx, qualityGateType string, jenkinsStepName strin
 	return id, nil
 }
 
-func GetCodebaseAndBranchIds(txn sql.Tx, autotestName, branchName, schemaName string) (*model.CodebaseBranchIdDTO, error) {
+func GetCodebaseAndBranchIds(txn *sql.Tx, autotestName, branchName, schemaName string) (*model.CodebaseBranchIdDTO, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectCodebaseAndBranchIds, schemaName, schemaName))
 
 	if err != nil {
@@ -201,14 +201,14 @@ func GetCodebaseAndBranchIds(txn sql.Tx, autotestName, branchName, schemaName st
 	return &dto, nil
 }
 
-func DeleteCDStage(txn sql.Tx, pipeName, stageName, schema string) error {
+func DeleteCDStage(txn *sql.Tx, pipeName, stageName, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCDStage, schema), pipeName, stageName); err != nil {
 		return err
 	}
 	return nil
 }
 
-func SelectCodebaseDockerStreamId(txn sql.Tx, pipeName, stageName, schema string) (id *int, err error) {
+func SelectCodebaseDockerStreamId(txn *sql.Tx, pipeName, stageName, schema string) (id *int, err error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectCodebaseDockerStreamId, schema))
 	if err != nil {
 		return
@@ -221,21 +221,21 @@ func SelectCodebaseDockerStreamId(txn sql.Tx, pipeName, stageName, schema string
 	return
 }
 
-func DeleteCodebaseDockerStream(txn sql.Tx, id int, schema string) error {
+func DeleteCodebaseDockerStream(txn *sql.Tx, id int, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebaseDockerStream, schema), id); err != nil {
 		return err
 	}
 	return nil
 }
 
-func DeleteCodebaseDockerStreams(txn sql.Tx, pipeName, schema string) error {
+func DeleteCodebaseDockerStreams(txn *sql.Tx, pipeName, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebaseDockerStreamIds, schema), pipeName); err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateStageTriggerType(txn sql.Tx,  id int, schemaName, triggerType string) error {
+func UpdateStageTriggerType(txn *sql.Tx, id int, schemaName, triggerType string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(updateStageTriggerType, schemaName))
 	if err != nil {
 		return err

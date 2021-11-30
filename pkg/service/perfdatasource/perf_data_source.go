@@ -21,7 +21,7 @@ func (s PerfDataSourceService) perfDataSourceExists(dsType, tenant string) (bool
 		return false, err
 	}
 
-	exists, err := perfdatasource.PerfDataSourceExists(*txn, strings.ToUpper(dsType), tenant)
+	exists, err := perfdatasource.PerfDataSourceExists(txn, strings.ToUpper(dsType), tenant)
 	if err != nil {
 		return false, err
 	}
@@ -55,7 +55,7 @@ func (s PerfDataSourceService) InsertPerfDataSources(perf *codebase.Perf, tenant
 			continue
 		}
 
-		if err := perfdatasource.InsertPerfDataSource(*txn, strings.ToUpper(ds), tenant); err != nil {
+		if err := perfdatasource.InsertPerfDataSource(txn, strings.ToUpper(ds), tenant); err != nil {
 			_ = txn.Rollback()
 			return err
 		}
@@ -77,7 +77,7 @@ func (s PerfDataSourceService) RemoveCodebaseDataSource(codebase, dataSource, te
 		return err
 	}
 
-	if err := perfdatasource.RemoveCodebaseDataSource(*txn, codebase, dataSource, tenant); err != nil {
+	if err := perfdatasource.RemoveCodebaseDataSource(txn, codebase, dataSource, tenant); err != nil {
 		_ = txn.Rollback()
 		return err
 	}

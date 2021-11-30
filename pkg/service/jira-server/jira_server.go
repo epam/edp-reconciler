@@ -23,7 +23,7 @@ func (s JiraServerService) PutJiraServer(jira jiramodel.JiraServer) error {
 		return err
 	}
 
-	id, err := jiraserver.SelectJiraServer(*txn, jira.Name, jira.Tenant)
+	id, err := jiraserver.SelectJiraServer(txn, jira.Name, jira.Tenant)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred while fetching Jira Server %v", jira.Name)
@@ -44,8 +44,8 @@ func (s JiraServerService) PutJiraServer(jira jiramodel.JiraServer) error {
 func tryToPutJiraServer(txn *sql.Tx, id *int, jira jiramodel.JiraServer) error {
 	if id != nil {
 		log.V(2).Info("Start updating Jira Server")
-		return jiraserver.UpdateJiraServer(*txn, id, jira.Available, jira.Tenant)
+		return jiraserver.UpdateJiraServer(txn, id, jira.Available, jira.Tenant)
 	}
 	log.V(2).Info("Start creating Jira Server")
-	return jiraserver.CreateJiraServer(*txn, jira.Name, jira.Available, jira.Tenant)
+	return jiraserver.CreateJiraServer(txn, jira.Name, jira.Available, jira.Tenant)
 }

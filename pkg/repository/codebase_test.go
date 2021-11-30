@@ -45,7 +45,7 @@ func TestUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := Update(*tx, c, schema); err != nil {
+	if err := Update(tx, c, schema); err != nil {
 		t.Fatal(err)
 	}
 

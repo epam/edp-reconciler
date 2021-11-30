@@ -16,7 +16,7 @@ const (
 		" \"%[1]v\".codebase_branch cb left join \"%[1]v\".codebase c on cb.codebase_id = c.id where c.name = $1 and cb.name = $2);"
 )
 
-func GetCodebaseBranchId(txn sql.Tx, codebaseName string, codebaseBranchName string, schemaName string) (*int, error) {
+func GetCodebaseBranchId(txn *sql.Tx, codebaseName string, codebaseBranchName string, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(SelectCodebaseBranch, schemaName, schemaName))
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func GetCodebaseBranchId(txn sql.Tx, codebaseName string, codebaseBranchName str
 	return &id, nil
 }
 
-func CreateCodebaseBranch(txn sql.Tx, name string, beId int, fromCommit string,
+func CreateCodebaseBranch(txn *sql.Tx, name string, beId int, fromCommit string,
 	schemaName string, streamId *int, status string, version *string, buildNumber *string, lastSuccessBuild *string, release bool) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(InsertCodebaseBranch, schemaName))
 	if err != nil {
@@ -52,7 +52,7 @@ func CreateCodebaseBranch(txn sql.Tx, name string, beId int, fromCommit string,
 	return &id, nil
 }
 
-func UpdateStatusByCodebaseBranchId(txn sql.Tx, branchId int, status string, schemaName string) error {
+func UpdateStatusByCodebaseBranchId(txn *sql.Tx, branchId int, status string, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(UpdateCodebaseBranchStatus, schemaName))
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func UpdateStatusByCodebaseBranchId(txn sql.Tx, branchId int, status string, sch
 	return err
 }
 
-func UpdateCodebaseBranch(txn sql.Tx, branchId int, version *string, build *string, lastSuccess *string, schemaName string) error {
+func UpdateCodebaseBranch(txn *sql.Tx, branchId int, version *string, build *string, lastSuccess *string, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(UpdateCodebaseBranchValues, schemaName))
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func UpdateCodebaseBranch(txn sql.Tx, branchId int, version *string, build *stri
 	return err
 }
 
-func Delete(txn sql.Tx, codebase, branch, schema string) error {
+func Delete(txn *sql.Tx, codebase, branch, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebaseBranch, schema), codebase, branch); err != nil {
 		return err
 	}

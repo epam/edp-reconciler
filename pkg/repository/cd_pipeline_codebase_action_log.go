@@ -13,7 +13,7 @@ const (
 	insertCDPipelineActionLog = "insert into \"%v\".cd_pipeline_action_log(cd_pipeline_id, action_log_id) values ($1, $2);"
 )
 
-func CreateCDPipelineActionLog(txn sql.Tx, pipelineId int, actionLogId int, schemaName string) error {
+func CreateCDPipelineActionLog(txn *sql.Tx, pipelineId int, actionLogId int, schemaName string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertCDPipelineActionLog, schemaName))
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func CreateCDPipelineActionLog(txn sql.Tx, pipelineId int, actionLogId int, sche
 	return nil
 }
 
-func CreateEventActionLog(txn sql.Tx, actionLog model.ActionLog, schemaName string) (*int, error) {
+func CreateEventActionLog(txn *sql.Tx, actionLog model.ActionLog, schemaName string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertEventActionLog, schemaName))
 	if err != nil {
 		return nil, err

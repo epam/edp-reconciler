@@ -15,7 +15,7 @@ const (
 		"and cpds.codebase_id= (select c.id from \"%[1]v\".codebase c where c.name= $2);"
 )
 
-func PerfDataSourceExists(txn sql.Tx, dsType, tenant string) (bool, error) {
+func PerfDataSourceExists(txn *sql.Tx, dsType, tenant string) (bool, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(perfDataSourceExists, tenant))
 	if err != nil {
 		return false, err
@@ -32,7 +32,7 @@ func PerfDataSourceExists(txn sql.Tx, dsType, tenant string) (bool, error) {
 	return exists, err
 }
 
-func InsertPerfDataSource(txn sql.Tx, dsType, tenant string) error {
+func InsertPerfDataSource(txn *sql.Tx, dsType, tenant string) error {
 	stmt, err := txn.Prepare(fmt.Sprintf(insertPerfDataSource, tenant))
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func InsertPerfDataSource(txn sql.Tx, dsType, tenant string) error {
 	return err
 }
 
-func GetDataSourceId(txn sql.Tx, dsType, tenant string) (*int, error) {
+func GetDataSourceId(txn *sql.Tx, dsType, tenant string) (*int, error) {
 	stmt, err := txn.Prepare(fmt.Sprintf(selectPerfDataSource, tenant))
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func GetDataSourceId(txn sql.Tx, dsType, tenant string) (*int, error) {
 	return &id, err
 }
 
-func RemoveCodebaseDataSource(txn sql.Tx, codebase, dataSource, schema string) error {
+func RemoveCodebaseDataSource(txn *sql.Tx, codebase, dataSource, schema string) error {
 	if _, err := txn.Exec(fmt.Sprintf(deleteCodebasePerfDataSource, schema), strings.ToUpper(dataSource), codebase); err != nil {
 		return err
 	}

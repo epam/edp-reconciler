@@ -39,7 +39,7 @@ func (s CodebaseBranchService) PutCodebaseBranch(codebaseBranch codebasebranch.C
 	log.V(2).Info("CodebaseBranch has been updated", "name", codebaseBranch.Name)
 
 	log.V(2).Info("start update status of codebase branch...")
-	actionLogId, err := repository.CreateActionLog(*txn, codebaseBranch.ActionLog, schemaName)
+	actionLogId, err := repository.CreateActionLog(txn, codebaseBranch.ActionLog, schemaName)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during status creation %v", "name %v")
@@ -47,19 +47,19 @@ func (s CodebaseBranchService) PutCodebaseBranch(codebaseBranch codebasebranch.C
 	log.V(2).Info("ActionLog has been saved into the repository")
 
 	log.V(2).Info("Start update codebase_branch_action status of code branch entity...")
-	cbId, err := repository.GetCodebaseId(*txn, codebaseBranch.AppName, schemaName)
+	cbId, err := repository.GetCodebaseId(txn, codebaseBranch.AppName, schemaName)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during retrieving codebase id %v", "id %v")
 	}
 
-	if err := repository.CreateCodebaseAction(*txn, *cbId, *actionLogId, schemaName); err != nil {
+	if err := repository.CreateCodebaseAction(txn, *cbId, *actionLogId, schemaName); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrap(err, "an error has occurred during codebase_branch_action")
 	}
 	log.V(2).Info("codebase_action has been updated")
 
-	if err := cbs.UpdateStatusByCodebaseBranchId(*txn, *id, codebaseBranch.Status, codebaseBranch.Tenant); err != nil {
+	if err := cbs.UpdateStatusByCodebaseBranchId(txn, *id, codebaseBranch.Status, codebaseBranch.Tenant); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during the update of codebase branch %v", codebaseBranch.Name)
 	}
@@ -74,7 +74,7 @@ func (s CodebaseBranchService) PutCodebaseBranch(codebaseBranch codebasebranch.C
 func createCodebaseBranch(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBranch, schemaName string) (*int, error) {
 	log.V(2).Info("start codebase_branch insertion", "name", codebaseBranch.Name)
 	var streamId *int = nil
-	beId, err := repository.GetCodebaseId(*txn, codebaseBranch.AppName, schemaName)
+	beId, err := repository.GetCodebaseId(txn, codebaseBranch.AppName, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -82,20 +82,20 @@ func createCodebaseBranch(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBra
 		return nil, fmt.Errorf("%v codebase record has not been found", codebaseBranch.AppName)
 	}
 
-	cbType, err := repository.GetCodebaseTypeById(*txn, *beId, schemaName)
+	cbType, err := repository.GetCodebaseTypeById(txn, *beId, schemaName)
 	if err != nil {
 		return nil, err
 	}
 
 	if *cbType == string(codebase.Application) {
 		ocImageStreamName := fmt.Sprintf("%v-%v", codebaseBranch.AppName, codebaseBranch.Name)
-		streamId, err = repository.CreateCodebaseDockerStream(*txn, schemaName, nil, ocImageStreamName)
+		streamId, err = repository.CreateCodebaseDockerStream(txn, schemaName, nil, ocImageStreamName)
 		if err != nil {
 			return nil, err
 		}
 		log.V(2).Info("codebase docker stream has been created", "id", streamId)
 	}
-	id, err := cbs.CreateCodebaseBranch(*txn, codebaseBranch.Name, *beId,
+	id, err := cbs.CreateCodebaseBranch(txn, codebaseBranch.Name, *beId,
 		codebaseBranch.FromCommit, schemaName, streamId, codebaseBranch.Status, codebaseBranch.Version,
 		codebaseBranch.BuildNumber, codebaseBranch.LastSuccessBuild, codebaseBranch.Release)
 	if err != nil {
@@ -103,7 +103,7 @@ func createCodebaseBranch(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBra
 	}
 
 	if *cbType == string(codebase.Application) {
-		if err := repository.UpdateBranchIdCodebaseDockerStream(*txn, *streamId, *id, schemaName); err != nil {
+		if err := repository.UpdateBranchIdCodebaseDockerStream(txn, *streamId, *id, schemaName); err != nil {
 			return nil, err
 		}
 	}
@@ -114,7 +114,7 @@ func createCodebaseBranch(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBra
 func getCodebaseBranchIdOrCreate(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBranch, schemaName string) (*int, error) {
 	log.V(2).Info("start retrieving Codebase Branch",
 		"codebase", codebaseBranch.AppName, "branch", codebaseBranch.Name)
-	id, err := cbs.GetCodebaseBranchId(*txn, codebaseBranch.AppName, codebaseBranch.Name, schemaName)
+	id, err := cbs.GetCodebaseBranchId(txn, codebaseBranch.AppName, codebaseBranch.Name, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func getCodebaseBranchIdOrCreate(txn *sql.Tx, codebaseBranch codebasebranch.Code
 
 func updateCodebaseBranch(txn *sql.Tx, codebaseBranch codebasebranch.CodebaseBranch, id int, schemaName string) error {
 	log.V(2).Info("start updating CodebaseBranch by id", "id", id)
-	err := cbs.UpdateCodebaseBranch(*txn, id, codebaseBranch.Version, codebaseBranch.BuildNumber,
+	err := cbs.UpdateCodebaseBranch(txn, id, codebaseBranch.Version, codebaseBranch.BuildNumber,
 		codebaseBranch.LastSuccessBuild, schemaName)
 	if err != nil {
 		return err
@@ -141,7 +141,7 @@ func (s *CodebaseBranchService) Delete(codebase, branch, schema string) error {
 	if err != nil {
 		return err
 	}
-	if err := cbs.Delete(*txn, codebase, branch, schema); err != nil {
+	if err := cbs.Delete(txn, codebase, branch, schema); err != nil {
 		return errors.Wrapf(err, "couldn't delete %v codebase branch", codebase)
 	}
 	if err := txn.Commit(); err != nil {

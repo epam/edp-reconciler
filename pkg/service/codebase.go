@@ -41,7 +41,7 @@ func (s CodebaseService) PutCodebase(c codebase.Codebase) error {
 	log.Printf("Id of BE to be updated: %v", *id)
 
 	log.Println("Start update status of codebase...")
-	codebaseActionId, err := repository.CreateActionLog(*txn, c.ActionLog, c.Tenant)
+	codebaseActionId, err := repository.CreateActionLog(txn, c.ActionLog, c.Tenant)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during status creation: %v", c.Name)
@@ -49,13 +49,13 @@ func (s CodebaseService) PutCodebase(c codebase.Codebase) error {
 	log.Println("ActionLog has been saved into the repository")
 
 	log.Println("Start update codebase_action status of codebase...")
-	if err := repository.CreateCodebaseAction(*txn, *id, *codebaseActionId, c.Tenant); err != nil {
+	if err := repository.CreateCodebaseAction(txn, *id, *codebaseActionId, c.Tenant); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during codebase_action creation: %v", c.Name)
 	}
 	log.Println("codebase_action has been updated")
 
-	if err := repository.UpdateStatusByCodebaseId(*txn, *id, c.Status, c.Tenant); err != nil {
+	if err := repository.UpdateStatusByCodebaseId(txn, *id, c.Status, c.Tenant); err != nil {
 		log.Printf("Error has occurred during the update of codebase: %v", err)
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred during the update of codebase: %v", c.Name)
@@ -78,7 +78,7 @@ func (s CodebaseService) PutCodebase(c codebase.Codebase) error {
 
 func (s CodebaseService) putCodebase(txn *sql.Tx, c codebase.Codebase, schema string) (*int, error) {
 	log.Printf("Start retrieving Codebase by name, tenant and type: %v", c)
-	id, err := repository.GetCodebaseId(*txn, c.Name, schema)
+	id, err := repository.GetCodebaseId(txn, c.Name, schema)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func updateCodebase(txn *sql.Tx, c codebase.Codebase, schema string) error {
 		return err
 	}
 
-	if err := repository.Update(*txn, c, schema); err != nil {
+	if err := repository.Update(txn, c, schema); err != nil {
 		return errors.Wrapf(err, "couldn't update codebase %v", c.Name)
 	}
 	log.Printf("codebase %v has been updated", c.Name)
@@ -138,7 +138,7 @@ func setJenkinsSlaveId(txn *sql.Tx, c *codebase.Codebase, schema string) error {
 		return nil
 	}
 
-	jsId, err := jenkins_slave.SelectJenkinsSlave(*txn, *c.JenkinsSlave, schema)
+	jsId, err := jenkins_slave.SelectJenkinsSlave(txn, *c.JenkinsSlave, schema)
 	if err != nil || jsId == nil {
 		return errors.New(fmt.Sprintf("couldn't get jenkins slave id: %v", c.JenkinsSlave))
 	}
@@ -153,7 +153,7 @@ func setJobProvisioningId(txn *sql.Tx, c *codebase.Codebase, schema string) erro
 		return nil
 	}
 
-	jpId, err := jp.SelectJobProvision(*txn, *c.JobProvisioning, "ci", schema)
+	jpId, err := jp.SelectJobProvision(txn, *c.JobProvisioning, "ci", schema)
 	if err != nil || jpId == nil {
 		return errors.Wrapf(err, "couldn't get job provisioning id: %v", c.JobProvisioning)
 	}
@@ -195,7 +195,7 @@ func (s CodebaseService) createBE(txn *sql.Tx, c codebase.Codebase, schema strin
 		return nil, errors.Wrapf(err, "couldn't set %v perf server id", c.Perf.Name)
 	}
 
-	id, err = repository.CreateCodebase(*txn, c, schema)
+	id, err = repository.CreateCodebase(txn, c, schema)
 	if err != nil {
 		log.Printf("Error has occurred during business entity creation: %v", err)
 		return nil, errors.New(fmt.Sprintf("cannot create business entity %v", c))
@@ -224,7 +224,7 @@ func (s CodebaseService) setPerfServerIdToCodebaseDto(perf *codebase.Perf, tenan
 func getGitServerId(txn *sql.Tx, gitServerName string, schemaName string) (*int, error) {
 	log.Println("Fetching GitServer Id to set relation into codebase...")
 
-	serverId, err := repository.SelectGitServer(*txn, gitServerName, schemaName)
+	serverId, err := repository.SelectGitServer(txn, gitServerName, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func getJiraServerId(txn *sql.Tx, name *string, schemaName string) (*int, error)
 	}
 	log.Printf("Fetching JiraServer Id by %v name to set relation into codebase...", name)
 
-	id, err := jiraserver.SelectJiraServer(*txn, *name, schemaName)
+	id, err := jiraserver.SelectJiraServer(txn, *name, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (s CodebaseService) Delete(perf *v1alpha1.Perf, name, schema string) error 
 		return err
 	}
 
-	if err := repository.Delete(*txn, name, schema); err != nil {
+	if err := repository.Delete(txn, name, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete codebase %v", name)
 	}
@@ -273,7 +273,7 @@ func deleteCodebasePerfDataSourceRecord(txn *sql.Tx, perf *v1alpha1.Perf, name, 
 		return nil
 	}
 
-	id, err := repository.GetApplicationId(*txn, name, schema)
+	id, err := repository.GetApplicationId(txn, name, schema)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't get %v codebase id", name)
 	}
@@ -281,7 +281,7 @@ func deleteCodebasePerfDataSourceRecord(txn *sql.Tx, perf *v1alpha1.Perf, name, 
 		return nil
 	}
 
-	if err := codebaseperfdatasourceRepo.DeleteCodebasePerfDataSourceRecord(*txn, *id, schema); err != nil {
+	if err := codebaseperfdatasourceRepo.DeleteCodebasePerfDataSourceRecord(txn, *id, schema); err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "couldn't delete codebase perf data source record for codebase %v", name)
 	}

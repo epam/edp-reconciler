@@ -21,7 +21,7 @@ func (s PerfServerService) PutPerfServer(server perfserver.PerfServer, tenant st
 		return err
 	}
 
-	id, err := perfServerRepo.SelectPerfServer(*txn, server.Name, tenant)
+	id, err := perfServerRepo.SelectPerfServer(txn, server.Name, tenant)
 	if err != nil {
 		_ = txn.Rollback()
 		return errors.Wrapf(err, "an error has occurred while fetching PerfServer %v", server.Name)
@@ -42,10 +42,10 @@ func (s PerfServerService) PutPerfServer(server perfserver.PerfServer, tenant st
 func tryToPutPerfServer(txn *sql.Tx, id *int, server perfserver.PerfServer, schema string) error {
 	if id != nil {
 		log.Info("start updating PerfServer", "name", server.Name)
-		return perfServerRepo.UpdatePerfServer(*txn, id, server.Available, schema)
+		return perfServerRepo.UpdatePerfServer(txn, id, server.Available, schema)
 	}
 	log.Info("start creating PerfServer", "name", server.Name)
-	return perfServerRepo.CreatePerfServer(*txn, server.Name, server.Available, schema)
+	return perfServerRepo.CreatePerfServer(txn, server.Name, server.Available, schema)
 }
 
 func (s PerfServerService) GetPerfServerId(name, tenant string) (*int, error) {
@@ -55,7 +55,7 @@ func (s PerfServerService) GetPerfServerId(name, tenant string) (*int, error) {
 		return nil, err
 	}
 
-	id, err := perfServerRepo.SelectPerfServer(*txn, name, tenant)
+	id, err := perfServerRepo.SelectPerfServer(txn, name, tenant)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has occurred while fetching PerfServer %v", name)
 	}
