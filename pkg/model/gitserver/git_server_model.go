@@ -17,7 +17,6 @@
 package gitserver
 
 import (
-	"errors"
 	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -40,9 +39,6 @@ type GitServer struct {
 func ConvertToGitServer(k8sObj edpv1alpha1Codebase.GitServer, edpName string) (*GitServer, error) {
 	log.Info("Start converting GitServer", "data", k8sObj.Name)
 
-	if &k8sObj == nil {
-		return nil, errors.New("k8s git server object should not be nil")
-	}
 	spec := k8sObj.Spec
 
 	actionLog := convertGitServerActionLog(k8sObj.Status)
@@ -63,10 +59,6 @@ func ConvertToGitServer(k8sObj edpv1alpha1Codebase.GitServer, edpName string) (*
 }
 
 func convertGitServerActionLog(status edpv1alpha1Codebase.GitServerStatus) *model.ActionLog {
-	if &status == nil {
-		return nil
-	}
-
 	return &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,

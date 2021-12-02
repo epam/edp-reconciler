@@ -174,7 +174,7 @@ func TestCDPipelineActionMessages(t *testing.T) {
 		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
 
 	k8sObj.Status = edpv1alpha1.CDPipelineStatus{}
-	cdPipeline, err = ConvertToCDPipeline(k8sObj, edpName)
+	_, err = ConvertToCDPipeline(k8sObj, edpName)
 	if err != nil {
 		t.Fatal(err)
 	}

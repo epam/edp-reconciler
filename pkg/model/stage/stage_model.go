@@ -22,7 +22,6 @@ import (
 
 	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
-	"github.com/pkg/errors"
 )
 
 type Stage struct {
@@ -72,9 +71,6 @@ var cdStageActionMessageMap = map[string]string{
 // ConvertToStage returns converted to DTO Stage object from K8S and provided edp name
 // An error occurs if method received nil instead of k8s object
 func ConvertToStage(k8sObject v1alpha1.Stage, edpName string) (*Stage, error) {
-	if &k8sObject == nil {
-		return nil, errors.New("k8s object should be not nil")
-	}
 	spec := k8sObject.Spec
 	actionLog := convertStageActionLog(k8sObject.Name, k8sObject.Status)
 	stage := Stage{
@@ -121,9 +117,6 @@ func convertQualityGatesFromRequest(gates []v1alpha1.QualityGate) []QualityGate 
 }
 
 func convertStageActionLog(cdStageName string, status v1alpha1.StageStatus) *model.ActionLog {
-	if &status == nil {
-		return nil
-	}
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),

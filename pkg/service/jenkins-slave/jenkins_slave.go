@@ -13,13 +13,15 @@ type JenkinsSlaveService struct {
 	DB *sql.DB
 }
 
-func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave, schemaName string) error {
+func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave, schemaName string) (err error) {
 	log.Info("Start executing CreateSlavesOrDoNothing method... ")
 
 	txn, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
+	// TODO: lint Error return value of `txn.Rollback` is not checked (errcheck)
+	//nolint
 	defer txn.Rollback()
 
 	for _, s := range slaves {

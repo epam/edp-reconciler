@@ -20,7 +20,8 @@ func TestGetEDPNameHappyPath(t *testing.T) {
 			EDPNameKey: edpN,
 		},
 	}
-	cl := fake.NewFakeClient(cm)
+
+	cl := fake.NewClientBuilder().WithRuntimeObjects(cm).Build()
 
 	// when
 	actN, err := GetEDPName(cl, ns)
@@ -44,7 +45,7 @@ func TestGetEDPNameNoKey(t *testing.T) {
 		},
 		Data: map[string]string{},
 	}
-	cl := fake.NewFakeClient(cm)
+	cl := fake.NewClientBuilder().WithRuntimeObjects(cm).Build()
 
 	// when
 	actN, err := GetEDPName(cl, ns)
@@ -61,7 +62,7 @@ func TestGetEDPNameNoKey(t *testing.T) {
 func TestGetEDPNameNoCM(t *testing.T) {
 	// given
 	ns := "test-ns"
-	cl := fake.NewFakeClient()
+	cl := fake.NewClientBuilder().Build()
 
 	// when
 	actN, err := GetEDPName(cl, ns)

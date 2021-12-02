@@ -37,6 +37,10 @@ func TestCreateEventActionLog(t *testing.T) {
 
 	id, err := CreateEventActionLog(tx, log, "fake-schema")
 
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatal(err)
 	}

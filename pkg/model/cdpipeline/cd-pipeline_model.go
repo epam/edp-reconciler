@@ -17,7 +17,6 @@
 package cdpipeline
 
 import (
-	"errors"
 	"fmt"
 	edpv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
@@ -46,9 +45,6 @@ var cdPipelineActionMessageMap = map[string]string{
 // ConvertToCDPipeline returns converted to DTO CDPipeline object from K8S.
 // An error occurs if method received nil instead of k8s object
 func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDPipeline, error) {
-	if &k8sObject == nil {
-		return nil, errors.New("k8s object CD pipeline should not be nil")
-	}
 	spec := k8sObject.Spec
 
 	actionLog := convertCDPipelineActionLog(k8sObject.Name, k8sObject.Status)
@@ -68,9 +64,6 @@ func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDP
 }
 
 func convertCDPipelineActionLog(cdPipelineName string, status edpv1alpha1.CDPipelineStatus) *model.ActionLog {
-	if &status == nil {
-		return nil
-	}
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),

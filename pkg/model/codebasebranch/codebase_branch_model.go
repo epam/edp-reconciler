@@ -17,7 +17,6 @@
 package codebasebranch
 
 import (
-	"errors"
 	"fmt"
 	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
@@ -47,9 +46,7 @@ var codebaseBranchActionMessageMap = map[string]string{
 }
 
 func ConvertToCodebaseBranch(k8sObject edpv1alpha1Codebase.CodebaseBranch, edpName string) (*CodebaseBranch, error) {
-	if &k8sObject == nil {
-		return nil, errors.New("k8s object application branch object should not be nil")
-	}
+
 	spec := k8sObject.Spec
 
 	actionLog := convertCodebaseBranchActionLog(spec.BranchName, spec.CodebaseName, k8sObject.Status)
@@ -71,9 +68,6 @@ func ConvertToCodebaseBranch(k8sObject edpv1alpha1Codebase.CodebaseBranch, edpNa
 }
 
 func convertCodebaseBranchActionLog(brName, cbName string, status edpv1alpha1Codebase.CodebaseBranchStatus) *model.ActionLog {
-	if &status == nil {
-		return nil
-	}
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),

@@ -41,11 +41,7 @@ func (r *EDPComponent) SetupWithManager(mgr ctrl.Manager) error {
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			old := e.ObjectOld.(*edpCompApi.EDPComponent).Spec
 			new := e.ObjectNew.(*edpCompApi.EDPComponent).Spec
-
-			if reflect.DeepEqual(old, new) {
-				return false
-			}
-			return true
+			return !reflect.DeepEqual(old, new)
 		},
 	}
 

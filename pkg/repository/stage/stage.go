@@ -139,6 +139,8 @@ func GetStages(txn *sql.Tx, pipelineName string, schemaName string) ([]stage.Sta
 	defer stmt.Close()
 
 	rows, err := stmt.Query(pipelineName)
+	// TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
+	//nolint:staticcheck
 	defer rows.Close()
 	if err != nil {
 		_, err = checkNoRows(err)

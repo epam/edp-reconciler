@@ -51,11 +51,7 @@ func (r *ReconcileJobProvision) SetupWithManager(mgr ctrl.Manager) error {
 				return new[i].Name < new[j].Name
 			})
 
-			if reflect.DeepEqual(old, new) {
-				return false
-			}
-
-			return true
+			return !reflect.DeepEqual(old, new)
 		},
 	}
 

@@ -46,6 +46,8 @@ func CreateCodebaseDockerStream(txn *sql.Tx, schemaName string, branchId *int, o
 	if err != nil {
 		return
 	}
+	// TODO: handle err
+	//nolint:staticcheck
 	defer stmt.Close()
 
 	err = stmt.QueryRow(branchId, ocImageStreamName).Scan(&id)
@@ -58,9 +60,12 @@ func GetDockerStreamsByPipelineName(txn *sql.Tx, schemaName string, cdPipelineNa
 	if err != nil {
 		return nil, err
 	}
+	//TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
 	defer stmt.Close()
 
 	rows, err := stmt.Query(cdPipelineName)
+	//TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
+	//nolint:staticcheck
 	defer rows.Close()
 	if err != nil {
 		return nil, err
@@ -74,9 +79,12 @@ func GetDockerStreamsByPipelineNameAndStageOrder(txn *sql.Tx, schemaName string,
 	if err != nil {
 		return nil, err
 	}
+	//TODO: lint. should check returned error before deferring stmt.Close() (staticcheck)
 	defer stmt.Close()
 
 	rows, err := stmt.Query(cdPipelineName, order)
+	//TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
+	//nolint:staticcheck
 	defer rows.Close()
 	if err != nil {
 		return nil, err
@@ -120,9 +128,12 @@ func DeleteStageCodebaseDockerStream(txn *sql.Tx, stageId int, schemaName string
 	if err != nil {
 		return nil, err
 	}
+	//TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
 	defer stmt.Close()
 
 	rows, err := stmt.Query(stageId)
+	//TODO: lint. should check returned error before deferring rows.Close() (staticcheck)
+	//nolint:staticcheck
 	defer rows.Close()
 	if err != nil {
 		_, err = checkNoRows(err)

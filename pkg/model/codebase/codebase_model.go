@@ -17,7 +17,6 @@
 package codebase
 
 import (
-	"errors"
 	"fmt"
 	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
@@ -88,13 +87,7 @@ var codebaseActionMessageMap = map[string]string{
 }
 
 func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase, error) {
-	if &k8sObject == nil {
-		return nil, errors.New("k8s object cannot be nil")
-	}
 	s := k8sObject.Spec
-	if &s == nil {
-		return nil, errors.New("k8s spec cannot be nil")
-	}
 
 	status := convertActionLog(k8sObject.Name, k8sObject.Status)
 
@@ -158,9 +151,6 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 }
 
 func convertActionLog(name string, status edpv1alpha1Codebase.CodebaseStatus) *model.ActionLog {
-	if &status == nil {
-		return nil
-	}
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
