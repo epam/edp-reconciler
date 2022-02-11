@@ -1,11 +1,34 @@
 apiVersion: v2
 description: A Helm chart for EDP Reconciler
-home: https://solutionshub.epam.com/solution/epam-delivery-platform
+home: https://epam.github.io/edp-install/
 name: reconciler
 type: application
 version: 2.11.0-SNAPSHOT
 appVersion: 2.11.0-SNAPSHOT
+icon: https://epam.github.io/edp-install/assets/logo.png
+keywords:
+  - edp
+  - reconciler
+  - operator
 maintainers:
-  - name: EPAM EDP Team
+  - name: epmd-edp
+    email: SupportEPMD-EDP@epam.com
+    url: https://solutionshub.epam.com/solution/epam-delivery-platform
+  - name: sergk
+    url: https://github.com/SergK
 sources:
   - https://github.com/epam/edp-reconciler
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/operator: "true"
+  artifacthub.io/images: |
+    - name: reconciler:2.10.0
+      image: epamedp/reconciler:2.10.0
+    - name: reconciler:2.9.0
+      image: epamedp/reconciler:2.9.0
+  artifacthub.io/operatorCapabilities: Full Lifecycle
+  artifacthub.io/links: |
+    - name: EDP Documentation
+      url: https://epam.github.io/edp-install/
+    - name: EPAM SolutionHub
+      url: https://solutionshub.epam.com/solution/epam-delivery-platform
