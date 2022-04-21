@@ -13,12 +13,12 @@ replace (
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20210726142624-e26cea43163f
-	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20210719114732-5f764bacb870
-	github.com/epam/edp-common v0.0.0-20211124100535-e54dcdf42879
-	github.com/epam/edp-component-operator v0.1.1-0.20210712140516-09b8bb3a4cff
+	github.com/epam/edp-cd-pipeline-operator/v2 v2.3.0-58.0.20220420133602-29bfdf5defb2
+	github.com/epam/edp-codebase-operator/v2 v2.3.0-95.0.20211130102103-b05e463cf62b
+	github.com/epam/edp-common v0.0.0-20211206180607-3e1ca60d6e4a
+	github.com/epam/edp-component-operator v0.1.1-0.20211129100139-b5b7659f98f6
 	github.com/epam/edp-gerrit-operator/v2 v2.3.0-73.0.20210719111635-cdf07bed02a7
-	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20210719110425-d2d190f7bff9
+	github.com/epam/edp-jenkins-operator/v2 v2.3.0-130.0.20211129152322-3fdc74f98b19
 	github.com/epam/edp-perf-operator/v2 v2.0.0-20210719113600-816c452ccbb0
 	github.com/go-logr/logr v0.4.0
 	github.com/lib/pq v1.8.0
@@ -56,13 +56,14 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/google/go-cmp v0.5.2 // indirect
+	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/googleapis/gnostic v0.5.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/imdario/mergo v0.3.10 // indirect
+	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -73,23 +74,24 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.10.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect
 	go.uber.org/zap v1.15.0 // indirect
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	golang.org/x/net v0.0.0-20210224082022-3d97a244fca7 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/net v0.0.0-20210928044308-7d9f5e0b762b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073 // indirect
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.4 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	gomodules.xyz/jsonpatch/v2 v2.1.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/apiextensions-apiserver v0.20.2 // indirect
 	k8s.io/component-base v0.20.2 // indirect
 	k8s.io/klog/v2 v2.8.0 // indirect
