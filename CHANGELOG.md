@@ -1,9 +1,21 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Features
+
+- Update Makefile changelog target [EPMDEDP-8218](https://jiraeu.epam.com/browse/EPMDEDP-8218)
+- Generate CRDs and helm docs automatically [EPMDEDP-8385](https://jiraeu.epam.com/browse/EPMDEDP-8385)
+
+### Bug Fixes
+
+- Fix changelog generation in GH Release Action [EPMDEDP-8468](https://jiraeu.epam.com/browse/EPMDEDP-8468)
+
 ### Routine
 
 - Update release CI pipelines [EPMDEDP-7847](https://jiraeu.epam.com/browse/EPMDEDP-7847)
+- Populate chart with Artifacthub annotations [EPMDEDP-8049](https://jiraeu.epam.com/browse/EPMDEDP-8049)
+- Update base docker image to alpine 3.15.4 [EPMDEDP-8853](https://jiraeu.epam.com/browse/EPMDEDP-8853)
+- Update "github.com/epam/edp-cd-pipeline-operator/v2" package [EPMDEDP-8929](https://jiraeu.epam.com/browse/EPMDEDP-8929)
 
 
 <a name="v2.10.0"></a>
