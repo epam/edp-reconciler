@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v2.11.0"></a>
+## [v2.11.0] - 2022-05-10
 ### Features
 
 - Update Makefile changelog target [EPMDEDP-8218](https://jiraeu.epam.com/browse/EPMDEDP-8218)
@@ -16,6 +19,7 @@
 - Populate chart with Artifacthub annotations [EPMDEDP-8049](https://jiraeu.epam.com/browse/EPMDEDP-8049)
 - Update base docker image to alpine 3.15.4 [EPMDEDP-8853](https://jiraeu.epam.com/browse/EPMDEDP-8853)
 - Update "github.com/epam/edp-cd-pipeline-operator/v2" package [EPMDEDP-8929](https://jiraeu.epam.com/browse/EPMDEDP-8929)
+- Update changelog [EPMDEDP-9185](https://jiraeu.epam.com/browse/EPMDEDP-9185)
 
 
 <a name="v2.10.0"></a>
@@ -66,7 +70,8 @@
 <a name="v2.7.0"></a>
 ## [v2.7.0] - 2021-12-03
 
-[Unreleased]: https://github.com/epam/edp-reconciler/compare/v2.10.0...HEAD
+[Unreleased]: https://github.com/epam/edp-reconciler/compare/v2.11.0...HEAD
+[v2.11.0]: https://github.com/epam/edp-reconciler/compare/v2.10.0...v2.11.0
 [v2.10.0]: https://github.com/epam/edp-reconciler/compare/v2.9.0...v2.10.0
 [v2.9.0]: https://github.com/epam/edp-reconciler/compare/v2.8.1...v2.9.0
 [v2.8.1]: https://github.com/epam/edp-reconciler/compare/v2.8.0...v2.8.1
