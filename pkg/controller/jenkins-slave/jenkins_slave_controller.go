@@ -2,23 +2,24 @@ package jenkins_slave
 
 import (
 	"context"
-	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
-	"github.com/epam/edp-reconciler/v2/pkg/db"
-	"github.com/epam/edp-reconciler/v2/pkg/service/jenkins-slave"
-	"github.com/go-logr/logr"
 	"reflect"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sort"
 	"time"
 
-	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
+	"github.com/go-logr/logr"
 	errWrap "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/service/jenkins-slave"
 )
 
 func NewReconcileJenkinsSlave(client client.Client, log logr.Logger) *ReconcileJenkinsSlave {

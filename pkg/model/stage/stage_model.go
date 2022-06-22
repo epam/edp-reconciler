@@ -20,7 +20,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	cpPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
@@ -70,7 +71,7 @@ var cdStageActionMessageMap = map[string]string{
 
 // ConvertToStage returns converted to DTO Stage object from K8S and provided edp name
 // An error occurs if method received nil instead of k8s object
-func ConvertToStage(k8sObject v1alpha1.Stage, edpName string) (*Stage, error) {
+func ConvertToStage(k8sObject cpPipeApi.Stage, edpName string) (*Stage, error) {
 	spec := k8sObject.Spec
 	actionLog := convertStageActionLog(k8sObject.Name, k8sObject.Status)
 	stage := Stage{
@@ -96,7 +97,7 @@ func ConvertToStage(k8sObject v1alpha1.Stage, edpName string) (*Stage, error) {
 	return &stage, nil
 }
 
-func convertQualityGatesFromRequest(gates []v1alpha1.QualityGate) []QualityGate {
+func convertQualityGatesFromRequest(gates []cpPipeApi.QualityGate) []QualityGate {
 	var result []QualityGate
 
 	for _, val := range gates {
@@ -116,13 +117,13 @@ func convertQualityGatesFromRequest(gates []v1alpha1.QualityGate) []QualityGate 
 	return result
 }
 
-func convertStageActionLog(cdStageName string, status v1alpha1.StageStatus) *model.ActionLog {
+func convertStageActionLog(cdStageName string, status cpPipeApi.StageStatus) *model.ActionLog {
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,
 		Username:        status.Username,
-		UpdatedAt:       status.LastTimeUpdated,
+		UpdatedAt:       status.LastTimeUpdated.Time,
 		Action:          fmt.Sprint(status.Action),
 		Result:          fmt.Sprint(status.Result),
 	}

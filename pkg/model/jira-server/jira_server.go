@@ -1,6 +1,6 @@
 package jira_server
 
-import "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+import codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 
 type JiraServer struct {
 	Name      string
@@ -8,7 +8,7 @@ type JiraServer struct {
 	Tenant    string
 }
 
-func ConvertSpecToJira(jira v1alpha1.JiraServer, tenant string) JiraServer {
+func ConvertSpecToJira(jira codeBaseApi.JiraServer, tenant string) JiraServer {
 	return JiraServer{
 		Name:      jira.Name,
 		Available: jira.Status.Available,

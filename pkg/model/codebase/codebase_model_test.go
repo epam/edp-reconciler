@@ -17,28 +17,27 @@
 package codebase
 
 import (
-	edpv1alpha1 "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
-	"time"
 )
 
 func TestConvert(t *testing.T) {
 	frw := "spring-boot"
-	k8sObject := edpv1alpha1.Codebase{
+	k8sObject := codeBaseApi.Codebase{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "fightclub",
 			Name:      "fc-ui",
 		},
-		Spec: edpv1alpha1.CodebaseSpec{
+		Spec: codeBaseApi.CodebaseSpec{
 			Lang:      "java",
 			Framework: &frw,
 			BuildTool: "maven",
-			Strategy:  edpv1alpha1.Create,
+			Strategy:  codeBaseApi.Create,
 		},
-		Status: edpv1alpha1.CodebaseStatus{
+		Status: codeBaseApi.CodebaseStatus{
 			Available:       true,
-			LastTimeUpdated: time.Now(),
+			LastTimeUpdated: metav1.Now(),
 			Status:          "created",
 		},
 	}

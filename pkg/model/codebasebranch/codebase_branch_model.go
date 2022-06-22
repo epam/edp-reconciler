@@ -18,7 +18,9 @@ package codebasebranch
 
 import (
 	"fmt"
-	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
@@ -45,7 +47,7 @@ var codebaseBranchActionMessageMap = map[string]string{
 	"perf_data_source_cr_update":          "Update PerfDataSource CR. Branch - %v, Codebase - %v",
 }
 
-func ConvertToCodebaseBranch(k8sObject edpv1alpha1Codebase.CodebaseBranch, edpName string) (*CodebaseBranch, error) {
+func ConvertToCodebaseBranch(k8sObject codeBaseApi.CodebaseBranch, edpName string) (*CodebaseBranch, error) {
 
 	spec := k8sObject.Spec
 
@@ -67,13 +69,13 @@ func ConvertToCodebaseBranch(k8sObject edpv1alpha1Codebase.CodebaseBranch, edpNa
 	return &branch, nil
 }
 
-func convertCodebaseBranchActionLog(brName, cbName string, status edpv1alpha1Codebase.CodebaseBranchStatus) *model.ActionLog {
+func convertCodebaseBranchActionLog(brName, cbName string, status codeBaseApi.CodebaseBranchStatus) *model.ActionLog {
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,
 		Username:        status.Username,
-		UpdatedAt:       status.LastTimeUpdated,
+		UpdatedAt:       status.LastTimeUpdated.Time,
 		Action:          string(status.Action),
 		Result:          string(status.Result),
 	}

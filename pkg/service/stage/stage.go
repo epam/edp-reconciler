@@ -4,16 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	"github.com/pkg/errors"
+	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
+
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
 	"github.com/epam/edp-reconciler/v2/pkg/platform"
 	"github.com/epam/edp-reconciler/v2/pkg/repository"
 	"github.com/epam/edp-reconciler/v2/pkg/repository/codebasebranch"
 	sr "github.com/epam/edp-reconciler/v2/pkg/repository/stage"
-	"github.com/pkg/errors"
-	"k8s.io/client-go/rest"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 var log = ctrl.Log.WithName("cd_stage_service")
@@ -205,9 +207,9 @@ func getOriginalInputImageStream(tx *sql.Tx, cdPipelineName, codebaseName, schem
 	return originalInputStream, nil
 }
 
-func GetCDPipelineCR(edpRestClient *rest.RESTClient, crName string, namespace string) (*v1alpha1.CDPipeline, error) {
+func GetCDPipelineCR(edpRestClient *rest.RESTClient, crName string, namespace string) (*cdPipeApi.CDPipeline, error) {
 	log.V(2).Info("trying to fetch CD Pipeline to get Applications To Promote", "pipe name", crName)
-	cdPipeline := &v1alpha1.CDPipeline{}
+	cdPipeline := &cdPipeApi.CDPipeline{}
 	err := edpRestClient.Get().Namespace(namespace).Resource("cdpipelines").Name(crName).Do(context.TODO()).Into(cdPipeline)
 	if err != nil {
 		return nil, errors.Wrapf(err, "an error has occurred while getting CD Pipeline CR from cluster")

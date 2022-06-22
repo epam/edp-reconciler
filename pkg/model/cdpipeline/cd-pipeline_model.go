@@ -18,7 +18,9 @@ package cdpipeline
 
 import (
 	"fmt"
-	edpv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
@@ -44,7 +46,7 @@ var cdPipelineActionMessageMap = map[string]string{
 
 // ConvertToCDPipeline returns converted to DTO CDPipeline object from K8S.
 // An error occurs if method received nil instead of k8s object
-func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDPipeline, error) {
+func ConvertToCDPipeline(k8sObject cdPipeApi.CDPipeline, edpName string) (*CDPipeline, error) {
 	spec := k8sObject.Spec
 
 	actionLog := convertCDPipelineActionLog(k8sObject.Name, k8sObject.Status)
@@ -63,13 +65,13 @@ func ConvertToCDPipeline(k8sObject edpv1alpha1.CDPipeline, edpName string) (*CDP
 	return &cdPipeline, nil
 }
 
-func convertCDPipelineActionLog(cdPipelineName string, status edpv1alpha1.CDPipelineStatus) *model.ActionLog {
+func convertCDPipelineActionLog(cdPipelineName string, status cdPipeApi.CDPipelineStatus) *model.ActionLog {
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,
 		Username:        status.Username,
-		UpdatedAt:       status.LastTimeUpdated,
+		UpdatedAt:       status.LastTimeUpdated.Time,
 		Action:          fmt.Sprint(status.Action),
 		Result:          fmt.Sprint(status.Result),
 	}

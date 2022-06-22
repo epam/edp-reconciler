@@ -3,16 +3,18 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/epam/edp-perf-operator/v2/pkg/util/common"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
 	"github.com/epam/edp-reconciler/v2/pkg/repository"
 	js "github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
 	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"log"
-	"testing"
 )
 
 func newMock() (*sql.DB, sqlmock.Sqlmock) {

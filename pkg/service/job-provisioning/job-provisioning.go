@@ -2,11 +2,12 @@ package job_provisioning
 
 import (
 	"database/sql"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
+	"github.com/pkg/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	jenkinsV2Api "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
 	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
-	"github.com/pkg/errors"
 )
 
 var log = ctrl.Log.WithName("job-provisioning-service")
@@ -15,7 +16,7 @@ type JobProvisionService struct {
 	DB *sql.DB
 }
 
-func (s JobProvisionService) PutJobProvisions(provisions []jenkinsV2Api.JobProvision, schemaName string) error {
+func (s JobProvisionService) PutJobProvisions(provisions []jenkinsApi.JobProvision, schemaName string) error {
 	log.Info("Start executing PutJobProvisions method... ")
 
 	txn, err := s.DB.Begin()

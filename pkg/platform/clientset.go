@@ -1,7 +1,9 @@
 package platform
 
 import (
-	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"log"
+
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	appsV1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	projectV1Client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routeV1Client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
@@ -14,7 +16,6 @@ import (
 	coreV1Client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
 )
 
 var SchemeGroupVersion = schema.GroupVersion{Group: "v2.edp.epam.com", Version: "v1alpha1"}
@@ -123,8 +124,8 @@ func createCrdClient(cfg *rest.Config) (*rest.RESTClient, error) {
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&edpv1alpha1Codebase.CodebaseBranch{},
-		&edpv1alpha1Codebase.CodebaseBranchList{},
+		&codeBaseApi.CodebaseBranch{},
+		&codeBaseApi.CodebaseBranchList{},
 	)
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)

@@ -2,25 +2,26 @@ package stage
 
 import (
 	"context"
-	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
+	"reflect"
+	"time"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
 	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
 	"github.com/epam/edp-reconciler/v2/pkg/db"
 	"github.com/epam/edp-reconciler/v2/pkg/model/stage"
 	"github.com/epam/edp-reconciler/v2/pkg/platform"
 	stageService "github.com/epam/edp-reconciler/v2/pkg/service/stage"
-	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"time"
-
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
-	"reflect"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const stageReconcileFinalizerName = "stage.reconciler.finalizer.name"

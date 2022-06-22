@@ -1,7 +1,7 @@
 package model
 
 import (
-	edpComponentV1Api "github.com/epam/edp-component-operator/pkg/apis/v1/v1alpha1"
+	edpCompApi "github.com/epam/edp-component-operator/pkg/apis/v1/v1"
 )
 
 type EDPComponent struct {
@@ -11,7 +11,7 @@ type EDPComponent struct {
 	Visible bool
 }
 
-func ConvertToEDPComponent(k8sObj edpComponentV1Api.EDPComponent) (*EDPComponent, error) {
+func ConvertToEDPComponent(k8sObj edpCompApi.EDPComponent) (*EDPComponent, error) {
 	s := k8sObj.Spec
 
 	return &EDPComponent{

@@ -17,9 +17,10 @@
 package gitserver
 
 import (
-	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/model"
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
+
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 var log = ctrl.Log.WithName("git-server-model")
@@ -36,7 +37,7 @@ type GitServer struct {
 	Name                     string
 }
 
-func ConvertToGitServer(k8sObj edpv1alpha1Codebase.GitServer, edpName string) (*GitServer, error) {
+func ConvertToGitServer(k8sObj codeBaseApi.GitServer, edpName string) (*GitServer, error) {
 	log.Info("Start converting GitServer", "data", k8sObj.Name)
 
 	spec := k8sObj.Spec
@@ -58,12 +59,12 @@ func ConvertToGitServer(k8sObj edpv1alpha1Codebase.GitServer, edpName string) (*
 	return &gitServer, nil
 }
 
-func convertGitServerActionLog(status edpv1alpha1Codebase.GitServerStatus) *model.ActionLog {
+func convertGitServerActionLog(status codeBaseApi.GitServerStatus) *model.ActionLog {
 	return &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,
 		Username:        status.Username,
-		UpdatedAt:       status.LastTimeUpdated,
+		UpdatedAt:       status.LastTimeUpdated.Time,
 		Action:          status.Action,
 		Result:          status.Result,
 	}

@@ -2,18 +2,20 @@ package git_server
 
 import (
 	"context"
-	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
-	"github.com/epam/edp-reconciler/v2/pkg/db"
-	"github.com/epam/edp-reconciler/v2/pkg/model/gitserver"
-	"github.com/epam/edp-reconciler/v2/pkg/service/git"
-	"github.com/epam/edp-reconciler/v2/pkg/service/infrastructure"
+
+	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
 	"github.com/go-logr/logr"
 	errWrap "github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/model/gitserver"
+	"github.com/epam/edp-reconciler/v2/pkg/service/git"
+	"github.com/epam/edp-reconciler/v2/pkg/service/infrastructure"
 )
 
 func NewReconcileGitServer(client client.Client, log logr.Logger) *ReconcileGitServer {

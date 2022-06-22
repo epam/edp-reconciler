@@ -2,7 +2,8 @@ package jenkins_slave
 
 import (
 	"database/sql"
-	jenkinsV2Api "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 	"github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -13,7 +14,7 @@ type JenkinsSlaveService struct {
 	DB *sql.DB
 }
 
-func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsV2Api.Slave, schemaName string) (err error) {
+func (s JenkinsSlaveService) CreateSlavesOrDoNothing(slaves []jenkinsApi.Slave, schemaName string) (err error) {
 	log.Info("Start executing CreateSlavesOrDoNothing method... ")
 
 	txn, err := s.DB.Begin()

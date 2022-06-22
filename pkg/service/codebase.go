@@ -3,19 +3,20 @@ package service
 import (
 	"database/sql"
 	"fmt"
-	"github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	codebaseperfdatasourceRepo "github.com/epam/edp-reconciler/v2/pkg/repository/codebaseperfdatasource"
-	"github.com/epam/edp-reconciler/v2/pkg/service/codebaseperfdatasource"
-	"github.com/epam/edp-reconciler/v2/pkg/service/perfdatasource"
-	"github.com/epam/edp-reconciler/v2/pkg/service/perfserver"
 	"log"
+
+	codeBaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	"github.com/pkg/errors"
 
 	"github.com/epam/edp-reconciler/v2/pkg/model/codebase"
 	"github.com/epam/edp-reconciler/v2/pkg/repository"
+	codebaseperfdatasourceRepo "github.com/epam/edp-reconciler/v2/pkg/repository/codebaseperfdatasource"
 	"github.com/epam/edp-reconciler/v2/pkg/repository/jenkins-slave"
 	jiraserver "github.com/epam/edp-reconciler/v2/pkg/repository/jira-server"
 	jp "github.com/epam/edp-reconciler/v2/pkg/repository/job-provisioning"
-	"github.com/pkg/errors"
+	"github.com/epam/edp-reconciler/v2/pkg/service/codebaseperfdatasource"
+	"github.com/epam/edp-reconciler/v2/pkg/service/perfdatasource"
+	"github.com/epam/edp-reconciler/v2/pkg/service/perfserver"
 )
 
 type CodebaseService struct {
@@ -245,7 +246,7 @@ func getJiraServerId(txn *sql.Tx, name *string, schemaName string) (*int, error)
 	return id, nil
 }
 
-func (s CodebaseService) Delete(perf *v1alpha1.Perf, name, schema string) error {
+func (s CodebaseService) Delete(perf *codeBaseApi.Perf, name, schema string) error {
 	log.Printf("start deleting %v codebase", name)
 	txn, err := s.DB.Begin()
 	if err != nil {
@@ -268,7 +269,7 @@ func (s CodebaseService) Delete(perf *v1alpha1.Perf, name, schema string) error 
 	return nil
 }
 
-func deleteCodebasePerfDataSourceRecord(txn *sql.Tx, perf *v1alpha1.Perf, name, schema string) error {
+func deleteCodebasePerfDataSourceRecord(txn *sql.Tx, perf *codeBaseApi.Perf, name, schema string) error {
 	if perf == nil {
 		return nil
 	}

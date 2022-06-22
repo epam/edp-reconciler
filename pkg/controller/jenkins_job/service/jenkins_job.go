@@ -4,18 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	jenv1alpha1 "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
+
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 	"github.com/epam/edp-jenkins-operator/v2/pkg/util/consts"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
 	"github.com/epam/edp-reconciler/v2/pkg/db"
 	"github.com/epam/edp-reconciler/v2/pkg/model"
 	"github.com/epam/edp-reconciler/v2/pkg/repository"
 	"github.com/epam/edp-reconciler/v2/pkg/util/cluster"
-	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/types"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const ErrorStatus = "error"
@@ -33,7 +35,7 @@ type JenkinsJobService struct {
 
 var log = ctrl.Log.WithName("jenkins-job-service")
 
-func (s JenkinsJobService) UpdateActionLog(jj *jenv1alpha1.JenkinsJob) error {
+func (s JenkinsJobService) UpdateActionLog(jj *jenkinsApi.JenkinsJob) error {
 	log.V(2).Info("start adding action log for jenkins job", "name", jj.Name)
 	l, err := s.createActionLogModel(*jj)
 	if err != nil {
@@ -85,11 +87,11 @@ func (s JenkinsJobService) UpdateActionLog(jj *jenv1alpha1.JenkinsJob) error {
 
 }
 
-func (s JenkinsJobService) createActionLogModel(jj jenv1alpha1.JenkinsJob) (*model.ActionLog, error) {
+func (s JenkinsJobService) createActionLogModel(jj jenkinsApi.JenkinsJob) (*model.ActionLog, error) {
 	st := jj.Status
 	l := &model.ActionLog{
 		Username:        st.Username,
-		UpdatedAt:       st.LastTimeUpdated,
+		UpdatedAt:       st.LastTimeUpdated.Time,
 		Action:          fmt.Sprint(st.Action),
 		Result:          fmt.Sprint(st.Result),
 		DetailedMessage: st.DetailedMessage,
@@ -107,7 +109,7 @@ func (s JenkinsJobService) createActionLogModel(jj jenv1alpha1.JenkinsJob) (*mod
 	return l, nil
 }
 
-func (s JenkinsJobService) getStageInstanceOwner(jj jenv1alpha1.JenkinsJob) (*v1alpha1.Stage, error) {
+func (s JenkinsJobService) getStageInstanceOwner(jj jenkinsApi.JenkinsJob) (*cdPipeApi.Stage, error) {
 	log.V(2).Info("start getting stage owner cr", "stage", jj.Name)
 	if ow := cluster.GetOwnerReference(consts.StageKind, jj.GetOwnerReferences()); ow != nil {
 		log.V(2).Info("trying to fetch stage owner from reference", "stage", ow.Name)
@@ -120,12 +122,12 @@ func (s JenkinsJobService) getStageInstanceOwner(jj jenv1alpha1.JenkinsJob) (*v1
 	return nil, fmt.Errorf("couldn't find stage owner for jenkins job %v", jj.Name)
 }
 
-func (s JenkinsJobService) getStageInstance(name, namespace string) (*v1alpha1.Stage, error) {
+func (s JenkinsJobService) getStageInstance(name, namespace string) (*cdPipeApi.Stage, error) {
 	nsn := types.NamespacedName{
 		Namespace: namespace,
 		Name:      name,
 	}
-	i := &v1alpha1.Stage{}
+	i := &cdPipeApi.Stage{}
 	if err := s.Client.Get(context.TODO(), nsn, i); err != nil {
 		return nil, errors.Wrapf(err, "failed to get instance by name %v", name)
 	}

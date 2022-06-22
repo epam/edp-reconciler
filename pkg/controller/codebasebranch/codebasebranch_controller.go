@@ -2,24 +2,25 @@ package codebasebranch
 
 import (
 	"context"
-	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
+	"reflect"
+	"time"
+
+	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+	"github.com/go-logr/logr"
+	errWrap "github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
 	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
 	"github.com/epam/edp-reconciler/v2/pkg/db"
 	"github.com/epam/edp-reconciler/v2/pkg/model/codebasebranch"
 	cbs "github.com/epam/edp-reconciler/v2/pkg/service/codebasebranch"
-	"github.com/go-logr/logr"
-	"reflect"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"time"
-
-	errWrap "github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const codebaseBranchReconcileFinalizerName = "codebasebranch.reconciler.finalizer.name"

@@ -18,9 +18,11 @@ package codebase
 
 import (
 	"fmt"
-	edpv1alpha1Codebase "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/model"
 	"strings"
+
+	codebaseApi "github.com/epam/edp-codebase-operator/v2/pkg/apis/edp/v1"
+
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 const (
@@ -86,7 +88,7 @@ var codebaseActionMessageMap = map[string]string{
 	"put_gitlab_ci_file":             "Put GitlabCI file for %v codebase",
 }
 
-func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase, error) {
+func Convert(k8sObject codebaseApi.Codebase, edpName string) (*Codebase, error) {
 	s := k8sObject.Spec
 
 	status := convertActionLog(k8sObject.Name, k8sObject.Status)
@@ -150,13 +152,13 @@ func Convert(k8sObject edpv1alpha1Codebase.Codebase, edpName string) (*Codebase,
 	return &c, nil
 }
 
-func convertActionLog(name string, status edpv1alpha1Codebase.CodebaseStatus) *model.ActionLog {
+func convertActionLog(name string, status codebaseApi.CodebaseStatus) *model.ActionLog {
 
 	al := &model.ActionLog{
 		Event:           model.FormatStatus(status.Status),
 		DetailedMessage: status.DetailedMessage,
 		Username:        status.Username,
-		UpdatedAt:       status.LastTimeUpdated,
+		UpdatedAt:       status.LastTimeUpdated.Time,
 		Action:          string(status.Action),
 		Result:          string(status.Result),
 	}

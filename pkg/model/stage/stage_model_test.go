@@ -18,13 +18,12 @@ package stage
 
 import (
 	"fmt"
-	"testing"
-	"time"
-
-	edpv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/model"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"testing"
+
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 const (
@@ -44,22 +43,22 @@ const (
 )
 
 func TestConvertMethodToCDStage(t *testing.T) {
-	timeNow := time.Now()
+	timeNow := metav1.Now()
 	branchName := "fake-branch"
 	autotestName := "fake-autotest"
 
-	k8sObj := edpv1alpha1.Stage{
+	k8sObj := cdPipeApi.Stage{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "fake-namespace",
 			Name:      name,
 		},
-		Spec: edpv1alpha1.StageSpec{
+		Spec: cdPipeApi.StageSpec{
 			Name:        name,
 			CdPipeline:  cdPipelineName,
 			Description: fakeDescription,
 			TriggerType: triggerType,
 			Order:       1,
-			QualityGates: []edpv1alpha1.QualityGate{
+			QualityGates: []cdPipeApi.QualityGate{
 				{
 					QualityGateType: qualityGate,
 					BranchName:      &branchName,
@@ -69,7 +68,7 @@ func TestConvertMethodToCDStage(t *testing.T) {
 			},
 			JobProvisioning: jobProvisioning,
 		},
-		Status: edpv1alpha1.StageStatus{
+		Status: cdPipeApi.StageStatus{
 			Username:        username,
 			DetailedMessage: detailedMessage,
 			Value:           "active",
@@ -140,7 +139,7 @@ func TestConvertMethodToCDStage(t *testing.T) {
 		t.Fatal(fmt.Sprintf("username is incorrect %v", username))
 	}
 
-	if !cdStage.ActionLog.UpdatedAt.Equal(timeNow) {
+	if !cdStage.ActionLog.UpdatedAt.Equal(timeNow.Time) {
 		t.Fatal(fmt.Sprintf("'updated at' is incorrect %v", username))
 	}
 
@@ -172,18 +171,18 @@ func TestCDStageActionMessages(t *testing.T) {
 		autotestName = "fake-autotest"
 	)
 
-	k8sObj := edpv1alpha1.Stage{
+	k8sObj := cdPipeApi.Stage{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "fake-namespace",
 			Name:      name,
 		},
-		Spec: edpv1alpha1.StageSpec{
+		Spec: cdPipeApi.StageSpec{
 			Name:        name,
 			CdPipeline:  cdPipelineName,
 			Description: fakeDescription,
 			TriggerType: triggerType,
 			Order:       1,
-			QualityGates: []edpv1alpha1.QualityGate{
+			QualityGates: []cdPipeApi.QualityGate{
 				{
 					QualityGateType: qualityGate,
 					BranchName:      &branchName,
@@ -192,14 +191,14 @@ func TestCDStageActionMessages(t *testing.T) {
 				},
 			},
 		},
-		Status: edpv1alpha1.StageStatus{
+		Status: cdPipeApi.StageStatus{
 			Username:        username,
 			DetailedMessage: detailedMessage,
 			Value:           "active",
-			Action:          edpv1alpha1.AcceptCDStageRegistration,
+			Action:          cdPipeApi.AcceptCDStageRegistration,
 			Result:          result,
 			Available:       true,
-			LastTimeUpdated: time.Now(),
+			LastTimeUpdated: metav1.Now(),
 			Status:          event,
 		},
 	}
@@ -248,7 +247,7 @@ func TestCDStageActionMessages(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf(setupDeploymentTemplatesMsg, name), cdStage.ActionLog.ActionMessage,
 		fmt.Sprintf("converted action is incorrect %v", cdStage.ActionLog.ActionMessage))
 
-	k8sObj.Status = edpv1alpha1.StageStatus{}
+	k8sObj.Status = cdPipeApi.StageStatus{}
 	cdStage, err = ConvertToStage(k8sObj, edpN)
 	if err != nil {
 		t.Fatal(err)

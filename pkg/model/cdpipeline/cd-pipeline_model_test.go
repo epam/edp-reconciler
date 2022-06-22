@@ -18,12 +18,12 @@ package cdpipeline
 
 import (
 	"fmt"
-	edpv1alpha1 "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/model"
+	cdPipeApi "github.com/epam/edp-cd-pipeline-operator/v2/pkg/apis/edp/v1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
-	"time"
+
+	"github.com/epam/edp-reconciler/v2/pkg/model"
 )
 
 const (
@@ -39,19 +39,19 @@ const (
 )
 
 func TestConvertMethodToCDPipeline(t *testing.T) {
-	timeNow := time.Now()
+	timeNow := metav1.Now()
 
-	k8sObj := edpv1alpha1.CDPipeline{
+	k8sObj := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "fake-namespace",
 			Name:      name,
 		},
-		Spec: edpv1alpha1.CDPipelineSpec{
+		Spec: cdPipeApi.CDPipelineSpec{
 			Name:                  name,
 			InputDockerStreams:    []string{inputDockerStream},
 			ApplicationsToPromote: []string{applicationsToPromote},
 		},
-		Status: edpv1alpha1.CDPipelineStatus{
+		Status: cdPipeApi.CDPipelineStatus{
 			Username:        username,
 			DetailedMessage: detailedMessage,
 			Value:           "active",
@@ -88,7 +88,7 @@ func TestConvertMethodToCDPipeline(t *testing.T) {
 		t.Fatal(fmt.Sprintf("username is incorrect %v", username))
 	}
 
-	if !cdPipeline.ActionLog.UpdatedAt.Equal(timeNow) {
+	if !cdPipeline.ActionLog.UpdatedAt.Equal(timeNow.Time) {
 		t.Fatal(fmt.Sprintf("'updated at' is incorrect %v", username))
 	}
 
@@ -125,23 +125,23 @@ func TestCDPipelineActionMessages(t *testing.T) {
 		setupInitialStructureMsg        = "Initial structure for CD Pipeline %v is created"
 	)
 
-	k8sObj := edpv1alpha1.CDPipeline{
+	k8sObj := cdPipeApi.CDPipeline{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: "fake-namespace",
 			Name:      name,
 		},
-		Spec: edpv1alpha1.CDPipelineSpec{
+		Spec: cdPipeApi.CDPipelineSpec{
 			Name:                  name,
 			InputDockerStreams:    []string{inputDockerStream},
 			ApplicationsToPromote: []string{applicationsToPromote},
 		},
-		Status: edpv1alpha1.CDPipelineStatus{
+		Status: cdPipeApi.CDPipelineStatus{
 			Username:        username,
 			DetailedMessage: detailedMessage,
 			Value:           "active",
 			Result:          result,
 			Available:       true,
-			LastTimeUpdated: time.Now(),
+			LastTimeUpdated: metav1.Now(),
 			Status:          event,
 			Action:          "accept_cd_pipeline_registration",
 		},
@@ -164,7 +164,7 @@ func TestCDPipelineActionMessages(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf(jenkinsConfigurationMsg, name), cdPipeline.ActionLog.ActionMessage,
 		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
 
-	k8sObj.Status.Action = edpv1alpha1.SetupInitialStructureForCDPipeline
+	k8sObj.Status.Action = cdPipeApi.SetupInitialStructureForCDPipeline
 	cdPipeline, err = ConvertToCDPipeline(k8sObj, edpName)
 	if err != nil {
 		t.Fatal(err)
@@ -173,7 +173,7 @@ func TestCDPipelineActionMessages(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf(setupInitialStructureMsg, name), cdPipeline.ActionLog.ActionMessage,
 		fmt.Sprintf("converted action is incorrect %v", cdPipeline.ActionLog.ActionMessage))
 
-	k8sObj.Status = edpv1alpha1.CDPipelineStatus{}
+	k8sObj.Status = cdPipeApi.CDPipelineStatus{}
 	_, err = ConvertToCDPipeline(k8sObj, edpName)
 	if err != nil {
 		t.Fatal(err)

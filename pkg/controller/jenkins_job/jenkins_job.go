@@ -2,9 +2,9 @@ package jenkins_job
 
 import (
 	"context"
-	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/controller/jenkins_job/service"
-	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"time"
+
+	jenkinsApi "github.com/epam/edp-jenkins-operator/v2/pkg/apis/v2/v1"
 	"github.com/go-logr/logr"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,7 +14,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"time"
+
+	"github.com/epam/edp-reconciler/v2/pkg/controller/jenkins_job/service"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
 )
 
 func NewReconcileJenkinsJob(client client.Client, scheme *runtime.Scheme, log logr.Logger) *ReconcileJenkinsJob {

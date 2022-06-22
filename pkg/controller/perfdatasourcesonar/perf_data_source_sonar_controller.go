@@ -2,11 +2,9 @@ package perfdatasourcesonar
 
 import (
 	"context"
-	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1alpha1"
-	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
-	"github.com/epam/edp-reconciler/v2/pkg/db"
-	"github.com/epam/edp-reconciler/v2/pkg/service/perfdatasource"
-	"github.com/epam/edp-reconciler/v2/pkg/util/cluster"
+	"time"
+
+	perfApi "github.com/epam/edp-perf-operator/v2/pkg/apis/edp/v1"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -15,7 +13,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"time"
+
+	"github.com/epam/edp-reconciler/v2/pkg/controller/helper"
+	"github.com/epam/edp-reconciler/v2/pkg/db"
+	"github.com/epam/edp-reconciler/v2/pkg/service/perfdatasource"
+	"github.com/epam/edp-reconciler/v2/pkg/util/cluster"
 )
 
 const (
