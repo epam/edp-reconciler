@@ -69,7 +69,7 @@ helm-docs: helmdocs	## generate helm docs
 HELMDOCS = ${CURRENT_DIR}/bin/helm-docs
 .PHONY: helmdocs
 helmdocs: ## Download helm-docs locally if necessary.
-	$(call go-get-tool,$(HELMDOCS),github.com/norwoodj/helm-docs/cmd/helm-docs,v1.10.0)
+	$(call go-get-tool,$(HELMDOCS),github.com/norwoodj/helm-docs/cmd/helm-docs,v1.11.0)
 
 GITCHGLOG = ${CURRENT_DIR}/bin/git-chglog
 .PHONY: git-chglog
