@@ -28,8 +28,8 @@ A Helm chart for EDP Reconciler
 | global.database.port | int | `5432` |  |
 | global.edpName | string | `""` |  |
 | global.platform | string | `"openshift"` |  |
-| image.name | string | `"epamedp/reconciler"` |  |
-| image.version | string | `nil` |  |
+| image.repository | string | `"epamedp/reconciler"` |  |
+| image.tag | string | `nil` |  |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
 | name | string | `"reconciler"` |  |
 | nodeSelector | object | `{}` |  |
