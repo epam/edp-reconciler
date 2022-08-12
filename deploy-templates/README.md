@@ -23,15 +23,15 @@ A Helm chart for EDP Reconciler
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | annotations | object | `{}` |  |
-| global.database.host | string | `"edp-db"` |  |
-| global.database.name | string | `"edp-db"` |  |
-| global.database.port | int | `5432` |  |
-| global.edpName | string | `""` |  |
-| global.platform | string | `"openshift"` |  |
-| image.repository | string | `"epamedp/reconciler"` |  |
-| image.tag | string | `nil` |  |
+| global.database.host | string | `"edp-db"` | database host |
+| global.database.name | string | `"edp-db"` | database name |
+| global.database.port | int | `5432` | database port |
+| global.edpName | string | `""` | namespace or a project name (in case of OpenShift) |
+| global.platform | string | `"openshift"` | platform type that can be "kubernetes" or "openshift" |
+| image.repository | string | `"epamedp/reconciler"` | EDP reconciler Docker image name. The released image can be found on [Dockerhub](https://hub.docker.com/r/epamedp/reconciler) |
+| image.tag | string | `nil` | EDP reconciler Docker image tag. The released image can be found on [Dockerhub](https://hub.docker.com/r/epamedp/reconciler/tags) |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
-| name | string | `"reconciler"` |  |
+| name | string | `"reconciler"` | component name |
 | nodeSelector | object | `{}` |  |
 | resources.limits.memory | string | `"128Mi"` |  |
 | resources.requests.cpu | string | `"25m"` |  |
