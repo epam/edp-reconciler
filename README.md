@@ -33,14 +33,14 @@ In order to install the EDP Reconciler Operator, follow the steps below:
      ```
    Example response:
      ```bash
-     NAME              	CHART VERSION	APP VERSION	DESCRIPTION                    
+     NAME              	CHART VERSION	APP VERSION	DESCRIPTION
      epamedp/reconciler	2.11.0       	2.11.0     	A Helm chart for EDP Reconciler
      epamedp/reconciler	2.10.0       	2.10.0     	A Helm chart for EDP Reconciler
      ```
 
     _**NOTE:** It is highly recommended to use the latest released version._
 
-3. Full chart parameters available in [deploy-templates/README.md](deploy-templates/README.md):
+3. Full chart parameters available in [deploy-templates/README.md](deploy-templates/README.md).
 
 4. Install operator in the <edp-project> namespace with the helm command; find below the installation command example:
     ```bash
