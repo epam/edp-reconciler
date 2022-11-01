@@ -1,5 +1,8 @@
 [![codecov](https://codecov.io/gh/epam/edp-reconciler/branch/master/graph/badge.svg?token=NISU3J07BI)](https://codecov.io/gh/epam/edp-reconciler)
 
+|![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Warning.svg/156px-Warning.svg.png) | This operator is deprecated starting from EDP v2.13
+|---|---|
+
 # Reconciler Operator
 
 | :heavy_exclamation_mark: Please refer to [EDP documentation](https://epam.github.io/edp-install/) to get the notion of the main concepts and guidelines. |
